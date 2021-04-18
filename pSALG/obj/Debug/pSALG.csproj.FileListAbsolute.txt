@@ -1,0 +1,16 @@
+C:\Users\Alberto\Desktop\pSALG\pSALG\bin\Debug\pSALG.exe.config
+C:\Users\Alberto\Desktop\pSALG\pSALG\bin\Debug\pSALG.exe
+C:\Users\Alberto\Desktop\pSALG\pSALG\bin\Debug\pSALG.pdb
+C:\Users\Alberto\Desktop\pSALG\pSALG\obj\Debug\pSALG.MainForm.resources
+C:\Users\Alberto\Desktop\pSALG\pSALG\obj\Debug\pSALG.csproj.GenerateResource.Cache
+C:\Users\Alberto\Desktop\pSALG\pSALG\obj\Debug\pSALG.exe
+C:\Users\Alberto\Desktop\pSALG\pSALG\obj\Debug\pSALG.pdb
+C:\Users\Alberto\Desktop\pSALG\pSALG\obj\Debug\pSALG.csprojResolveAssemblyReference.cache
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\bin\Debug\pSALG.exe.config
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\bin\Debug\pSALG.exe
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\bin\Debug\pSALG.pdb
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\obj\Debug\pSALG.csprojResolveAssemblyReference.cache
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\obj\Debug\pSALG.MainForm.resources
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\obj\Debug\pSALG.csproj.GenerateResource.Cache
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\obj\Debug\pSALG.exe
+C:\Users\Alberto\Desktop\GarciaOchoaJoseAlbertoCF\pSALG\obj\Debug\pSALG.pdb
