@@ -16,21 +16,29 @@ namespace pSALG
 		}
 		
 		void ButtonShowImageClick(object sender, EventArgs e){
-			openFileDialogToSearchFile.ShowDialog();
-			pictureBoxShowImage.Image = Image.FromFile(openFileDialogToSearchFile.FileName);
+			try{
+				openFileDialogToSearchFile.ShowDialog();
+				pictureBoxShowImage.Image = Image.FromFile(openFileDialogToSearchFile.FileName);				
+			}catch(Exception){
+				MessageBox.Show("No image has been selected");
+			}
 		}
 		
 		void ButtonAnalizeClick(object sender, EventArgs e){
-			bmp = new Bitmap(openFileDialogToSearchFile.FileName);
-			pictureBoxShowImage.Image = bmp;
-			circles.Clear();
-			graph.clear();
-			binarized();
-			searchCircles();
-			addVertices();
-			searchEdges();
-			pairClosestPoints();
-			printGraph();
+			try{
+				bmp = new Bitmap(openFileDialogToSearchFile.FileName);
+				pictureBoxShowImage.Image = bmp;
+				circles.Clear();
+				graph.clear();
+				binarized();
+				searchCircles();
+				addVertices();
+				searchEdges();
+				pairClosestPoints();
+				printGraph();				
+			}catch(Exception){
+				MessageBox.Show("No image has been selected");
+			}
 		}
 		
 		Boolean isBlack(Color color){ 
@@ -244,21 +252,21 @@ namespace pSALG
 		
 		void addVertices(){
 			foreach(Circle c in circles){
-				graph.addVertex(c.getId());	
+				graph.addVertex(c);	
 			}
-			
 		}
 		
 		void searchEdges(){
-			Circle source = new Circle();
+			Circle s = new Circle(); //s = source
+			double weight;
 			foreach(Vertex v in graph.getVertices()){
-				source = circles.Find(d=>d.getId()==v.getData());
+				s = circles.Find(d=>d.getId()==v.getData().getId());
 				foreach(Circle c in circles){
-					if(c.getId() != source.getId()){
-						if(!thereIsObstacle(source.getX(),source.getY(),source.getRadio(),
-						                    c.getX(),c.getY(),c.getRadio())){
+					if(c.getId() != s.getId()){
+						if(!thereIsObstacle(s.getX(),s.getY(),s.getRadio(),c.getX(),c.getY(),c.getRadio())){
 							try{
-								graph.addEdge(v.getData(),c.getId());	
+								weight = calculateDistance(s.getX(),s.getY(),c.getX(),c.getY());
+								graph.addEdge(s,c,weight); //(source, destination, weight)
 							}catch(Exception ex){
 								MessageBox.Show(ex.ToString());
 							}
@@ -277,11 +285,11 @@ namespace pSALG
 			listBoxClosestCircles.Items.Clear();
 			minDistance = Math.Sqrt(Math.Pow(bmp.Height, 2) + Math.Pow(bmp.Width, 2));//Diagonal
 			
-			if(circles.Count == 1){
-				listBoxClosestCircles.Items.Add("There is only one point");
-			}
-			else if(circles.Count == 0){
+			if(circles.Count == 0){
 				listBoxClosestCircles.Items.Add("There is no point");
+			}
+			else if(circles.Count == 1){
+				listBoxClosestCircles.Items.Add("There is only one point");
 			}
 			else{
 				foreach(Circle c in circles){
@@ -303,6 +311,8 @@ namespace pSALG
 				markPoint(x1,y1,closestPoint.X,true);
 				markPoint(x2,y2,closestPoint.Y,true);
 				representation = "The closest point is (" + closestPoint.X + ", " + closestPoint.Y + ")." + '\n';
+				listBoxClosestCircles.Items.Add(representation);
+				representation = "Euclidian distance: " + minDistance + '\n';		
 				listBoxClosestCircles.Items.Add(representation);				
 			}
 		}
@@ -347,9 +357,15 @@ namespace pSALG
 		}
 		
 		void printGraph(){
-			listBoxGraph.Items.Clear();
+			int i;
+			i = 0;
+			treeViewGraph.Nodes.Clear();
 			foreach(Vertex v in graph.getVertices()){
-				listBoxGraph.Items.Add(v.toString());
+				treeViewGraph.Nodes.Add(v.getData().getId().ToString());
+				foreach(Edge e in v.getAdjacencyList()){
+					treeViewGraph.Nodes[i].Nodes.Add(e.toString());
+				}
+				i++;
 			}
 		}
 	}

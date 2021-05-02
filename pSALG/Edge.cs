@@ -6,19 +6,19 @@ namespace pSALG{
 	/// </summary>
 	public class Edge{
 		Vertex destination;
-		int weight;
-		public Edge(Vertex destination/*, int weight*/){
+		double weight;
+		public Edge(Vertex destination, double weight){
 			this.destination = destination;
-			this.weight = 1;
+			this.weight = weight;
 		}
 		public Vertex getDestination(){
 			return destination;
 		}
-		public int getWeight(){
+		public double getWeight(){
 			return weight;
 		}
 		public string toString(){
-			return destination.getData().ToString();
+			return ">" + destination.getData().getId() + ", " + weight;
 		}
 	}
 }

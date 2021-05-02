@@ -18,12 +18,12 @@ namespace pSALG
 		private System.Windows.Forms.Button buttonShowImage;
 		private System.Windows.Forms.OpenFileDialog openFileDialogToSearchFile;
 		private System.Windows.Forms.Button buttonAnalize;
-		private System.Windows.Forms.ListBox listBoxGraph;
 		private System.Windows.Forms.Label labelGraphDesc;
 		private System.Windows.Forms.Label labelClosestCircles;
 		private System.Windows.Forms.ListBox listBoxClosestCircles;
 		private System.Windows.Forms.Label labelSelectImage;
 		private System.Windows.Forms.Label labelClickOnDesc;
+		private System.Windows.Forms.TreeView treeViewGraph;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -47,12 +47,12 @@ namespace pSALG
 			this.buttonShowImage = new System.Windows.Forms.Button();
 			this.openFileDialogToSearchFile = new System.Windows.Forms.OpenFileDialog();
 			this.buttonAnalize = new System.Windows.Forms.Button();
-			this.listBoxGraph = new System.Windows.Forms.ListBox();
 			this.labelGraphDesc = new System.Windows.Forms.Label();
 			this.labelClosestCircles = new System.Windows.Forms.Label();
 			this.listBoxClosestCircles = new System.Windows.Forms.ListBox();
 			this.labelSelectImage = new System.Windows.Forms.Label();
 			this.labelClickOnDesc = new System.Windows.Forms.Label();
+			this.treeViewGraph = new System.Windows.Forms.TreeView();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxShowImage)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -68,6 +68,7 @@ namespace pSALG
 			// 
 			// buttonShowImage
 			// 
+			this.buttonShowImage.Cursor = System.Windows.Forms.Cursors.Hand;
 			this.buttonShowImage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.buttonShowImage.Location = new System.Drawing.Point(799, 9);
 			this.buttonShowImage.Margin = new System.Windows.Forms.Padding(5);
@@ -84,6 +85,7 @@ namespace pSALG
 			// 
 			// buttonAnalize
 			// 
+			this.buttonAnalize.Cursor = System.Windows.Forms.Cursors.Hand;
 			this.buttonAnalize.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.buttonAnalize.Location = new System.Drawing.Point(993, 9);
 			this.buttonAnalize.Margin = new System.Windows.Forms.Padding(5);
@@ -94,27 +96,16 @@ namespace pSALG
 			this.buttonAnalize.UseVisualStyleBackColor = true;
 			this.buttonAnalize.Click += new System.EventHandler(this.ButtonAnalizeClick);
 			// 
-			// listBoxGraph
-			// 
-			this.listBoxGraph.Font = new System.Drawing.Font("Miriam Mono CLM", 12.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-			this.listBoxGraph.FormattingEnabled = true;
-			this.listBoxGraph.ItemHeight = 19;
-			this.listBoxGraph.Location = new System.Drawing.Point(701, 84);
-			this.listBoxGraph.Margin = new System.Windows.Forms.Padding(5);
-			this.listBoxGraph.Name = "listBoxGraph";
-			this.listBoxGraph.Size = new System.Drawing.Size(374, 232);
-			this.listBoxGraph.TabIndex = 3;
-			// 
 			// labelGraphDesc
 			// 
 			this.labelGraphDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelGraphDesc.ForeColor = System.Drawing.SystemColors.HotTrack;
-			this.labelGraphDesc.Location = new System.Drawing.Point(701, 55);
+			this.labelGraphDesc.Location = new System.Drawing.Point(701, 58);
 			this.labelGraphDesc.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
 			this.labelGraphDesc.Name = "labelGraphDesc";
-			this.labelGraphDesc.Size = new System.Drawing.Size(244, 24);
+			this.labelGraphDesc.Size = new System.Drawing.Size(312, 21);
 			this.labelGraphDesc.TabIndex = 6;
-			this.labelGraphDesc.Text = "Graph (Vertices -> Edges)";
+			this.labelGraphDesc.Text = "Graph (Vertices -> { Edges, Weight })";
 			// 
 			// labelClosestCircles
 			// 
@@ -155,17 +146,24 @@ namespace pSALG
 			this.labelClickOnDesc.TabIndex = 10;
 			this.labelClickOnDesc.Text = "and click on";
 			// 
+			// treeViewGraph
+			// 
+			this.treeViewGraph.Location = new System.Drawing.Point(701, 82);
+			this.treeViewGraph.Name = "treeViewGraph";
+			this.treeViewGraph.Size = new System.Drawing.Size(378, 249);
+			this.treeViewGraph.TabIndex = 11;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1091, 483);
+			this.Controls.Add(this.treeViewGraph);
 			this.Controls.Add(this.labelClickOnDesc);
 			this.Controls.Add(this.labelSelectImage);
 			this.Controls.Add(this.listBoxClosestCircles);
 			this.Controls.Add(this.labelClosestCircles);
 			this.Controls.Add(this.labelGraphDesc);
-			this.Controls.Add(this.listBoxGraph);
 			this.Controls.Add(this.buttonAnalize);
 			this.Controls.Add(this.buttonShowImage);
 			this.Controls.Add(this.pictureBoxShowImage);

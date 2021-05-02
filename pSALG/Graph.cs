@@ -6,26 +6,34 @@ namespace pSALG{
 	/// Description of Graph.
 	/// </summary>
 	public class Graph{
-		List<Vertex> nodes;
+		List<Vertex> vertices;
 		
 		public Graph(){
-			nodes = new List<Vertex>();
+			vertices = new List<Vertex>();
 		}
 		
-		public void addVertex(int id){
-			Vertex node = new Vertex(id);
-			nodes.Add(node);
+		public void addVertex(Circle c){
+			Vertex vertex = new Vertex(c);
+			vertices.Add(vertex);
 		}
 		
-		public Vertex findVertex(int id){
-			return nodes.Find(v=>v.getData()==id);
+		public Vertex findVertex(Circle c){
+			return vertices.Find(v=>v.getData().getId()==c.getId());
 		}
 		
 		public List<Vertex> getVertices(){
-			return nodes;
+			return vertices;
 		}
 		
-		public Boolean addEdge(int s, int d){ //(soruce,destination)
+		public int getVertexCount(){
+			return vertices.Count;
+		}
+		
+		public Vertex getVertexAt(int i){
+			return vertices[i];
+		}
+		
+		public Boolean addEdge(Circle s, Circle d, double weight){ //(source,destination,weight)
 			Vertex source,destination;
 			
 			if((source = findVertex(s))==null){
@@ -34,12 +42,12 @@ namespace pSALG{
 			if((destination = findVertex(d))==null){
 				throw new Exception("The node " + d + " does not exist");
 			}
-			return addEdge(source,destination);
+			return addEdge(source,destination,weight);
 		}
 		
-		public Boolean addEdge(Vertex source, Vertex destination){
+		public Boolean addEdge(Vertex source, Vertex destination, double weight){
 			if((source.getAdjacencyList().Find(v=>v.getDestination()==destination))==null){
-				source.getAdjacencyList().Add(new Edge(destination));
+				source.getAdjacencyList().Add(new Edge(destination,weight));
 				return true;
 			}
 			return false;
@@ -48,14 +56,14 @@ namespace pSALG{
 		public string toString(){
 			string g;
 			g = "";
-			foreach(Vertex v in nodes){
+			foreach(Vertex v in vertices){
 				g += v.toString();
 			}
 			return g;
 		}
 		
 		public void clear(){
-			nodes.Clear();
+			vertices.Clear();
 		}
 	}
 }

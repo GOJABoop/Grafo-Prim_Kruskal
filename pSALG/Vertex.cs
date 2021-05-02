@@ -6,22 +6,32 @@ namespace pSALG
 	/// Description of Vertex.
 	/// </summary>
 	public class Vertex{
-		int data;
+		Circle data;
 		List<Edge> adjacencyList;
 		
-		public Vertex(int data){
+		public Vertex(Circle data){
 			this.data = data;
 			this.adjacencyList = new List<Edge>();
 		}
-		public int  getData(){
+		
+		public Circle  getData(){
 			return data;
 		}
+		
 		public List<Edge> getAdjacencyList(){
 			return adjacencyList;
+		}	
+		
+		public int getEdgesCount(){
+			return adjacencyList.Count;
+		}
+		
+		public Edge getEdgeAt(int i){
+			return adjacencyList[i];
 		}
 		public string toString(){
 			string connection;
-			connection = data + "->";
+			connection = data.getId() + "->";
 			foreach(Edge e in adjacencyList){
 				connection += e.toString() + "->";
 			}
