@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 
 namespace pSALG{
-	/// <summary>
-	/// Description of Graph.
-	/// </summary>
 	public class Graph{
 		List<Vertex> vertices;
 		

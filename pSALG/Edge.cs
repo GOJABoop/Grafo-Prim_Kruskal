@@ -1,9 +1,6 @@
 ﻿using System;
 
 namespace pSALG{
-	/// <summary>
-	/// Description of Edge.
-	/// </summary>
 	public class Edge{
 		Vertex destination;
 		double weight;

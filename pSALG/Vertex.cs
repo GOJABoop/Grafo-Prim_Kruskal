@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 
 namespace pSALG
-{	/// <summary>
-	/// Description of Vertex.
-	/// </summary>
+{
 	public class Vertex{
 		Circle data;
 		List<Edge> adjacencyList;

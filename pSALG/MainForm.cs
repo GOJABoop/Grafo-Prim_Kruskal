@@ -25,7 +25,7 @@ namespace pSALG
 		}
 		
 		void ButtonAnalizeClick(object sender, EventArgs e){
-			try{
+			
 				bmp = new Bitmap(openFileDialogToSearchFile.FileName);
 				pictureBoxShowImage.Image = bmp;
 				circles.Clear();
@@ -35,10 +35,9 @@ namespace pSALG
 				addVertices();
 				searchEdges();
 				pairClosestPoints();
-				printGraph();				
-			}catch(Exception){
-				MessageBox.Show("No image has been selected");
-			}
+				printGraph();
+				kruskal();
+			
 		}
 		
 		Boolean isBlack(Color color){ 
@@ -274,6 +273,26 @@ namespace pSALG
 					}
 				}
 			}
+		}
+		
+		void kruskal(){
+			DisjointSet sets = new DisjointSet(graph.getVertexCount());
+			Vertex vertex = null;
+			foreach(Vertex v in graph.getVertices()){
+				sets.makeSet(v.getData().getId()-1);
+			}
+			foreach(Vertex v in graph.getVertices()){
+				if(vertex == null) vertex = new Vertex(v.getData());
+				foreach(Edge e in v.getAdjacencyList()){
+					if(v.getData().getId() != e.getDestination().getData().getId()){
+						if(sets.findSet(v.getData().getId()-1) == sets.findSet(e.getDestination().getData().getId()-1)){
+							vertex.getAdjacencyList().Add(e);
+							sets.union(v.getData().getId()-1, e.getDestination().getData().getId()-1);
+						}
+					}
+				}
+			}
+			listBoxClosestCircles.Items.Add(vertex.toString());
 		}
 		
 		void pairClosestPoints(){
