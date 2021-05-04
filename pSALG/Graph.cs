@@ -4,9 +4,11 @@ using System.Collections.Generic;
 namespace pSALG{
 	public class Graph{
 		List<Vertex> vertices;
+		double weight;
 		
 		public Graph(){
 			vertices = new List<Vertex>();
+			weight = 0;
 		}
 		
 		public void addVertex(Circle c){
@@ -29,6 +31,10 @@ namespace pSALG{
 		public Vertex getVertexAt(int i){
 			return vertices[i];
 		}
+
+		public double getWeight(){
+			return weight;
+		}
 		
 		public Boolean addEdge(Circle s, Circle d, double weight){ //(source,destination,weight)
 			Vertex source,destination;
@@ -45,6 +51,7 @@ namespace pSALG{
 		public Boolean addEdge(Vertex source, Vertex destination, double weight){
 			if((source.getAdjacencyList().Find(v=>v.getDestination()==destination))==null){
 				source.getAdjacencyList().Add(new Edge(destination,weight));
+				this.weight += weight;
 				return true;
 			}
 			return false;

@@ -19,11 +19,25 @@ namespace pSALG
 		private System.Windows.Forms.OpenFileDialog openFileDialogToSearchFile;
 		private System.Windows.Forms.Button buttonAnalize;
 		private System.Windows.Forms.Label labelGraphDesc;
-		private System.Windows.Forms.Label labelClosestCircles;
-		private System.Windows.Forms.ListBox listBoxClosestCircles;
+		private System.Windows.Forms.Label labelKruskal;
+		private System.Windows.Forms.ListBox listBoxKruskalEdges;
 		private System.Windows.Forms.Label labelSelectImage;
-		private System.Windows.Forms.Label labelClickOnDesc;
 		private System.Windows.Forms.TreeView treeViewGraph;
+		private System.Windows.Forms.Label labelOrderOfEdgesKruskal;
+		private System.Windows.Forms.Label labelPrim;
+		private System.Windows.Forms.ListBox listBoxPrim;
+		private System.Windows.Forms.Label labelOrderEdgesPrim;
+		private System.Windows.Forms.TreeView treeViewMstKruskal;
+		private System.Windows.Forms.Label labelWeightKruskal;
+		private System.Windows.Forms.ListBox listBoxWeightKruskal;
+		private System.Windows.Forms.Label labelMstCreatedKruskal;
+		private System.Windows.Forms.ListBox listBoxMstCreatedKruskal;
+		private System.Windows.Forms.TreeView treeViewMstPrim;
+		private System.Windows.Forms.Label labelWeigthPrim;
+		private System.Windows.Forms.Label labelMstCreatedPrim;
+		private System.Windows.Forms.ListBox listBoxWeightPrim;
+		private System.Windows.Forms.ListBox listBoxMstCreatedPrim;
+		private System.Windows.Forms.Label label1;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -48,18 +62,32 @@ namespace pSALG
 			this.openFileDialogToSearchFile = new System.Windows.Forms.OpenFileDialog();
 			this.buttonAnalize = new System.Windows.Forms.Button();
 			this.labelGraphDesc = new System.Windows.Forms.Label();
-			this.labelClosestCircles = new System.Windows.Forms.Label();
-			this.listBoxClosestCircles = new System.Windows.Forms.ListBox();
+			this.labelKruskal = new System.Windows.Forms.Label();
+			this.listBoxKruskalEdges = new System.Windows.Forms.ListBox();
 			this.labelSelectImage = new System.Windows.Forms.Label();
-			this.labelClickOnDesc = new System.Windows.Forms.Label();
 			this.treeViewGraph = new System.Windows.Forms.TreeView();
+			this.labelOrderOfEdgesKruskal = new System.Windows.Forms.Label();
+			this.labelPrim = new System.Windows.Forms.Label();
+			this.listBoxPrim = new System.Windows.Forms.ListBox();
+			this.labelOrderEdgesPrim = new System.Windows.Forms.Label();
+			this.treeViewMstKruskal = new System.Windows.Forms.TreeView();
+			this.labelWeightKruskal = new System.Windows.Forms.Label();
+			this.listBoxWeightKruskal = new System.Windows.Forms.ListBox();
+			this.labelMstCreatedKruskal = new System.Windows.Forms.Label();
+			this.listBoxMstCreatedKruskal = new System.Windows.Forms.ListBox();
+			this.treeViewMstPrim = new System.Windows.Forms.TreeView();
+			this.labelWeigthPrim = new System.Windows.Forms.Label();
+			this.labelMstCreatedPrim = new System.Windows.Forms.Label();
+			this.listBoxWeightPrim = new System.Windows.Forms.ListBox();
+			this.listBoxMstCreatedPrim = new System.Windows.Forms.ListBox();
+			this.label1 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxShowImage)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// pictureBoxShowImage
 			// 
 			this.pictureBoxShowImage.Location = new System.Drawing.Point(14, 14);
-			this.pictureBoxShowImage.Margin = new System.Windows.Forms.Padding(5);
+			this.pictureBoxShowImage.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
 			this.pictureBoxShowImage.Name = "pictureBoxShowImage";
 			this.pictureBoxShowImage.Size = new System.Drawing.Size(679, 463);
 			this.pictureBoxShowImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
@@ -70,8 +98,8 @@ namespace pSALG
 			// 
 			this.buttonShowImage.Cursor = System.Windows.Forms.Cursors.Hand;
 			this.buttonShowImage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.buttonShowImage.Location = new System.Drawing.Point(799, 9);
-			this.buttonShowImage.Margin = new System.Windows.Forms.Padding(5);
+			this.buttonShowImage.Location = new System.Drawing.Point(85, 485);
+			this.buttonShowImage.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
 			this.buttonShowImage.Name = "buttonShowImage";
 			this.buttonShowImage.Size = new System.Drawing.Size(68, 31);
 			this.buttonShowImage.TabIndex = 1;
@@ -87,8 +115,8 @@ namespace pSALG
 			// 
 			this.buttonAnalize.Cursor = System.Windows.Forms.Cursors.Hand;
 			this.buttonAnalize.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.buttonAnalize.Location = new System.Drawing.Point(993, 9);
-			this.buttonAnalize.Margin = new System.Windows.Forms.Padding(5);
+			this.buttonAnalize.Location = new System.Drawing.Point(163, 485);
+			this.buttonAnalize.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
 			this.buttonAnalize.Name = "buttonAnalize";
 			this.buttonAnalize.Size = new System.Drawing.Size(70, 31);
 			this.buttonAnalize.TabIndex = 2;
@@ -100,75 +128,211 @@ namespace pSALG
 			// 
 			this.labelGraphDesc.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelGraphDesc.ForeColor = System.Drawing.SystemColors.HotTrack;
-			this.labelGraphDesc.Location = new System.Drawing.Point(701, 58);
+			this.labelGraphDesc.Location = new System.Drawing.Point(493, 485);
 			this.labelGraphDesc.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
 			this.labelGraphDesc.Name = "labelGraphDesc";
-			this.labelGraphDesc.Size = new System.Drawing.Size(312, 21);
+			this.labelGraphDesc.Size = new System.Drawing.Size(185, 21);
 			this.labelGraphDesc.TabIndex = 6;
-			this.labelGraphDesc.Text = "Graph (Vertices -> { Edges, Weight })";
+			this.labelGraphDesc.Text = "<- General Graph(s)";
 			// 
-			// labelClosestCircles
+			// labelKruskal
 			// 
-			this.labelClosestCircles.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelClosestCircles.ForeColor = System.Drawing.SystemColors.HotTrack;
-			this.labelClosestCircles.Location = new System.Drawing.Point(701, 334);
-			this.labelClosestCircles.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
-			this.labelClosestCircles.Name = "labelClosestCircles";
-			this.labelClosestCircles.Size = new System.Drawing.Size(312, 27);
-			this.labelClosestCircles.TabIndex = 7;
-			this.labelClosestCircles.Text = "Pair of closest points";
+			this.labelKruskal.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelKruskal.ForeColor = System.Drawing.SystemColors.HotTrack;
+			this.labelKruskal.Location = new System.Drawing.Point(716, 9);
+			this.labelKruskal.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
+			this.labelKruskal.Name = "labelKruskal";
+			this.labelKruskal.Size = new System.Drawing.Size(81, 27);
+			this.labelKruskal.TabIndex = 7;
+			this.labelKruskal.Text = " Kruskal";
 			// 
-			// listBoxClosestCircles
+			// listBoxKruskalEdges
 			// 
-			this.listBoxClosestCircles.Font = new System.Drawing.Font("Miriam Mono CLM", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
-			this.listBoxClosestCircles.FormattingEnabled = true;
-			this.listBoxClosestCircles.ItemHeight = 18;
-			this.listBoxClosestCircles.Location = new System.Drawing.Point(701, 364);
-			this.listBoxClosestCircles.Name = "listBoxClosestCircles";
-			this.listBoxClosestCircles.Size = new System.Drawing.Size(374, 94);
-			this.listBoxClosestCircles.TabIndex = 8;
+			this.listBoxKruskalEdges.Font = new System.Drawing.Font("Miriam Mono CLM", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+			this.listBoxKruskalEdges.FormattingEnabled = true;
+			this.listBoxKruskalEdges.ItemHeight = 18;
+			this.listBoxKruskalEdges.Location = new System.Drawing.Point(964, 39);
+			this.listBoxKruskalEdges.Name = "listBoxKruskalEdges";
+			this.listBoxKruskalEdges.Size = new System.Drawing.Size(93, 220);
+			this.listBoxKruskalEdges.TabIndex = 8;
 			// 
 			// labelSelectImage
 			// 
 			this.labelSelectImage.ForeColor = System.Drawing.SystemColors.GrayText;
-			this.labelSelectImage.Location = new System.Drawing.Point(701, 14);
+			this.labelSelectImage.Location = new System.Drawing.Point(14, 490);
 			this.labelSelectImage.Name = "labelSelectImage";
-			this.labelSelectImage.Size = new System.Drawing.Size(90, 23);
+			this.labelSelectImage.Size = new System.Drawing.Size(63, 23);
 			this.labelSelectImage.TabIndex = 9;
-			this.labelSelectImage.Text = "Select an";
-			// 
-			// labelClickOnDesc
-			// 
-			this.labelClickOnDesc.ForeColor = System.Drawing.SystemColors.GrayText;
-			this.labelClickOnDesc.Location = new System.Drawing.Point(875, 14);
-			this.labelClickOnDesc.Name = "labelClickOnDesc";
-			this.labelClickOnDesc.Size = new System.Drawing.Size(110, 23);
-			this.labelClickOnDesc.TabIndex = 10;
-			this.labelClickOnDesc.Text = "and click on";
+			this.labelSelectImage.Text = "Select";
 			// 
 			// treeViewGraph
 			// 
-			this.treeViewGraph.Location = new System.Drawing.Point(701, 82);
+			this.treeViewGraph.Location = new System.Drawing.Point(241, 479);
 			this.treeViewGraph.Name = "treeViewGraph";
-			this.treeViewGraph.Size = new System.Drawing.Size(378, 249);
+			this.treeViewGraph.Size = new System.Drawing.Size(244, 198);
 			this.treeViewGraph.TabIndex = 11;
+			// 
+			// labelOrderOfEdgesKruskal
+			// 
+			this.labelOrderOfEdgesKruskal.Location = new System.Drawing.Point(871, 9);
+			this.labelOrderOfEdgesKruskal.Name = "labelOrderOfEdgesKruskal";
+			this.labelOrderOfEdgesKruskal.Size = new System.Drawing.Size(202, 27);
+			this.labelOrderOfEdgesKruskal.TabIndex = 12;
+			this.labelOrderOfEdgesKruskal.Text = "Edge selection order";
+			// 
+			// labelPrim
+			// 
+			this.labelPrim.ForeColor = System.Drawing.SystemColors.HotTrack;
+			this.labelPrim.Location = new System.Drawing.Point(716, 345);
+			this.labelPrim.Name = "labelPrim";
+			this.labelPrim.Size = new System.Drawing.Size(55, 23);
+			this.labelPrim.TabIndex = 13;
+			this.labelPrim.Text = "Prim";
+			// 
+			// listBoxPrim
+			// 
+			this.listBoxPrim.Font = new System.Drawing.Font("Miriam Mono CLM", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+			this.listBoxPrim.FormattingEnabled = true;
+			this.listBoxPrim.ItemHeight = 18;
+			this.listBoxPrim.Location = new System.Drawing.Point(964, 371);
+			this.listBoxPrim.Name = "listBoxPrim";
+			this.listBoxPrim.Size = new System.Drawing.Size(93, 220);
+			this.listBoxPrim.TabIndex = 14;
+			// 
+			// labelOrderEdgesPrim
+			// 
+			this.labelOrderEdgesPrim.Location = new System.Drawing.Point(871, 345);
+			this.labelOrderEdgesPrim.Name = "labelOrderEdgesPrim";
+			this.labelOrderEdgesPrim.Size = new System.Drawing.Size(186, 23);
+			this.labelOrderEdgesPrim.TabIndex = 15;
+			this.labelOrderEdgesPrim.Text = "Edge selection order";
+			// 
+			// treeViewMstKruskal
+			// 
+			this.treeViewMstKruskal.ForeColor = System.Drawing.Color.Black;
+			this.treeViewMstKruskal.Location = new System.Drawing.Point(716, 40);
+			this.treeViewMstKruskal.Name = "treeViewMstKruskal";
+			this.treeViewMstKruskal.Size = new System.Drawing.Size(242, 218);
+			this.treeViewMstKruskal.TabIndex = 16;
+			// 
+			// labelWeightKruskal
+			// 
+			this.labelWeightKruskal.Location = new System.Drawing.Point(716, 272);
+			this.labelWeightKruskal.Name = "labelWeightKruskal";
+			this.labelWeightKruskal.Size = new System.Drawing.Size(81, 23);
+			this.labelWeightKruskal.TabIndex = 17;
+			this.labelWeightKruskal.Text = "Weight:";
+			// 
+			// listBoxWeightKruskal
+			// 
+			this.listBoxWeightKruskal.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.listBoxWeightKruskal.FormattingEnabled = true;
+			this.listBoxWeightKruskal.ItemHeight = 20;
+			this.listBoxWeightKruskal.Location = new System.Drawing.Point(792, 271);
+			this.listBoxWeightKruskal.Name = "listBoxWeightKruskal";
+			this.listBoxWeightKruskal.Size = new System.Drawing.Size(265, 24);
+			this.listBoxWeightKruskal.TabIndex = 18;
+			// 
+			// labelMstCreatedKruskal
+			// 
+			this.labelMstCreatedKruskal.Location = new System.Drawing.Point(716, 304);
+			this.labelMstCreatedKruskal.Name = "labelMstCreatedKruskal";
+			this.labelMstCreatedKruskal.Size = new System.Drawing.Size(129, 23);
+			this.labelMstCreatedKruskal.TabIndex = 19;
+			this.labelMstCreatedKruskal.Text = "MST Created:";
+			// 
+			// listBoxMstCreatedKruskal
+			// 
+			this.listBoxMstCreatedKruskal.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.listBoxMstCreatedKruskal.FormattingEnabled = true;
+			this.listBoxMstCreatedKruskal.ItemHeight = 20;
+			this.listBoxMstCreatedKruskal.Location = new System.Drawing.Point(835, 301);
+			this.listBoxMstCreatedKruskal.Name = "listBoxMstCreatedKruskal";
+			this.listBoxMstCreatedKruskal.Size = new System.Drawing.Size(124, 24);
+			this.listBoxMstCreatedKruskal.TabIndex = 20;
+			// 
+			// treeViewMstPrim
+			// 
+			this.treeViewMstPrim.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+			this.treeViewMstPrim.Location = new System.Drawing.Point(715, 371);
+			this.treeViewMstPrim.Name = "treeViewMstPrim";
+			this.treeViewMstPrim.Size = new System.Drawing.Size(243, 220);
+			this.treeViewMstPrim.TabIndex = 21;
+			// 
+			// labelWeigthPrim
+			// 
+			this.labelWeigthPrim.Location = new System.Drawing.Point(716, 610);
+			this.labelWeigthPrim.Name = "labelWeigthPrim";
+			this.labelWeigthPrim.Size = new System.Drawing.Size(81, 23);
+			this.labelWeigthPrim.TabIndex = 22;
+			this.labelWeigthPrim.Text = "Weight: ";
+			// 
+			// labelMstCreatedPrim
+			// 
+			this.labelMstCreatedPrim.Location = new System.Drawing.Point(716, 647);
+			this.labelMstCreatedPrim.Name = "labelMstCreatedPrim";
+			this.labelMstCreatedPrim.Size = new System.Drawing.Size(129, 23);
+			this.labelMstCreatedPrim.TabIndex = 23;
+			this.labelMstCreatedPrim.Text = "MST Created:";
+			// 
+			// listBoxWeightPrim
+			// 
+			this.listBoxWeightPrim.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.listBoxWeightPrim.FormattingEnabled = true;
+			this.listBoxWeightPrim.ItemHeight = 20;
+			this.listBoxWeightPrim.Location = new System.Drawing.Point(792, 609);
+			this.listBoxWeightPrim.Name = "listBoxWeightPrim";
+			this.listBoxWeightPrim.Size = new System.Drawing.Size(265, 24);
+			this.listBoxWeightPrim.TabIndex = 24;
+			// 
+			// listBoxMstCreatedPrim
+			// 
+			this.listBoxMstCreatedPrim.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.listBoxMstCreatedPrim.FormattingEnabled = true;
+			this.listBoxMstCreatedPrim.ItemHeight = 20;
+			this.listBoxMstCreatedPrim.Location = new System.Drawing.Point(835, 639);
+			this.listBoxMstCreatedPrim.Name = "listBoxMstCreatedPrim";
+			this.listBoxMstCreatedPrim.Size = new System.Drawing.Size(124, 24);
+			this.listBoxMstCreatedPrim.TabIndex = 25;
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(508, 531);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(202, 45);
+			this.label1.TabIndex = 26;
+			this.label1.Text = "Select a vertex to start Prim\'s algorithm";
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1091, 483);
+			this.ClientSize = new System.Drawing.Size(1069, 689);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.listBoxMstCreatedPrim);
+			this.Controls.Add(this.listBoxWeightPrim);
+			this.Controls.Add(this.labelMstCreatedPrim);
+			this.Controls.Add(this.labelWeigthPrim);
+			this.Controls.Add(this.treeViewMstPrim);
+			this.Controls.Add(this.listBoxMstCreatedKruskal);
+			this.Controls.Add(this.labelMstCreatedKruskal);
+			this.Controls.Add(this.listBoxWeightKruskal);
+			this.Controls.Add(this.labelWeightKruskal);
+			this.Controls.Add(this.treeViewMstKruskal);
+			this.Controls.Add(this.labelOrderEdgesPrim);
+			this.Controls.Add(this.listBoxPrim);
+			this.Controls.Add(this.labelPrim);
+			this.Controls.Add(this.labelOrderOfEdgesKruskal);
 			this.Controls.Add(this.treeViewGraph);
-			this.Controls.Add(this.labelClickOnDesc);
 			this.Controls.Add(this.labelSelectImage);
-			this.Controls.Add(this.listBoxClosestCircles);
-			this.Controls.Add(this.labelClosestCircles);
+			this.Controls.Add(this.listBoxKruskalEdges);
+			this.Controls.Add(this.labelKruskal);
 			this.Controls.Add(this.labelGraphDesc);
 			this.Controls.Add(this.buttonAnalize);
 			this.Controls.Add(this.buttonShowImage);
 			this.Controls.Add(this.pictureBoxShowImage);
 			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.Margin = new System.Windows.Forms.Padding(5);
+			this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
 			this.Name = "MainForm";
 			this.Text = "pSALG";
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxShowImage)).EndInit();

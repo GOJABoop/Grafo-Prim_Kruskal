@@ -7,8 +7,10 @@ namespace pSALG
 {
 	public partial class MainForm : Form
 	{
-		List<Circle> circles = new List<Circle>();
-		Graph graph = new Graph();
+		List<Circle> circles;
+		List<KeyValuePair<double,Tuple<Vertex,Circle>>> edges;
+		Graph graph;
+		Graph mstKruskal;
 		Bitmap bmp;
 		
 		public MainForm(){
@@ -25,18 +27,16 @@ namespace pSALG
 		}
 		
 		void ButtonAnalizeClick(object sender, EventArgs e){
-			
+				circles = new List<Circle>();
+				graph = new Graph();
 				bmp = new Bitmap(openFileDialogToSearchFile.FileName);
 				pictureBoxShowImage.Image = bmp;
-				circles.Clear();
-				graph.clear();
 				binarized();
 				searchCircles();
 				addVertices();
 				searchEdges();
-				pairClosestPoints();
 				printGraph();
-				kruskal();
+				kruskalProcedure();
 			
 		}
 		
@@ -142,9 +142,6 @@ namespace pSALG
 						return true;
 					}
 				}
-				for(y = Math.Min(y1,y2); y < limit; y++){
-					bmp.SetPixel((int)x,(int)y,Color.Green);
-				}
 			}
 			else{
 				limit = Math.Max(x1,x2);//search an obstacle
@@ -155,11 +152,8 @@ namespace pSALG
 						return true;
 					}
 				}
-				for(x = Math.Min(x1,x2); x <= limit; x++){//printLine
-					y = ((double)m * (double)x) + (double)c;
-					bmp.SetPixel((int)x,(int)y,Color.Green);
-				}
 			}
+			printLine(false,x1,y1,x2,y2);
 			return false;
 		}
 
@@ -257,6 +251,7 @@ namespace pSALG
 		
 		void searchEdges(){
 			Circle s = new Circle(); //s = source
+			edges = new List<KeyValuePair<double, Tuple<Vertex, Circle>>>();
 			double weight;
 			foreach(Vertex v in graph.getVertices()){
 				s = circles.Find(d=>d.getId()==v.getData().getId());
@@ -265,6 +260,7 @@ namespace pSALG
 						if(!thereIsObstacle(s.getX(),s.getY(),s.getRadio(),c.getX(),c.getY(),c.getRadio())){
 							try{
 								weight = calculateDistance(s.getX(),s.getY(),c.getX(),c.getY());
+								edges.Add(new KeyValuePair<double, Tuple<Vertex, Circle>>(weight,new Tuple<Vertex,Circle>(v,c)));
 								graph.addEdge(s,c,weight); //(source, destination, weight)
 							}catch(Exception ex){
 								MessageBox.Show(ex.ToString());
@@ -275,67 +271,77 @@ namespace pSALG
 			}
 		}
 		
-		void kruskal(){
+		List<Tuple<Circle,Circle>> kruskal(){
 			DisjointSet sets = new DisjointSet(graph.getVertexCount());
-			Vertex vertex = null;
-			foreach(Vertex v in graph.getVertices()){
-				sets.makeSet(v.getData().getId()-1);
+			List<Tuple<Circle,Circle>> kruskalEdges = new List<Tuple<Circle,Circle>>();
+			int u,v;
+			foreach(Vertex vtx in graph.getVertices()){
+				sets.makeSet(vtx.getData().getId()-1);
 			}
-			foreach(Vertex v in graph.getVertices()){
-				if(vertex == null) vertex = new Vertex(v.getData());
-				foreach(Edge e in v.getAdjacencyList()){
-					if(v.getData().getId() != e.getDestination().getData().getId()){
-						if(sets.findSet(v.getData().getId()-1) == sets.findSet(e.getDestination().getData().getId()-1)){
-							vertex.getAdjacencyList().Add(e);
-							sets.union(v.getData().getId()-1, e.getDestination().getData().getId()-1);
-						}
+			edges.Sort((x,y) => x.Key.CompareTo(y.Key));
+			for(int i = 0; i < edges.Count; i++){
+				u = edges[i].Value.Item1.getData().getId()-1;
+				v = edges[i].Value.Item2.getId()-1;
+				if(u != v){
+					if(sets.findSet(u) != sets.findSet(v)){
+						kruskalEdges.Add(new Tuple<Circle,Circle>(edges[i].Value.Item1.getData(),edges[i].Value.Item2));
+						sets.union(u,v);
 					}
 				}
 			}
-			listBoxClosestCircles.Items.Add(vertex.toString());
+			return kruskalEdges;
 		}
 		
-		void pairClosestPoints(){
-			double minDistance, currentDistance;
-			int  x1, y1, x2, y2;
+		void kruskalProcedure(){
 			string representation;
-			Point closestPoint = new Point();
-			x1 = y1 = x2 = y2 = 0;
-			listBoxClosestCircles.Items.Clear();
-			minDistance = Math.Sqrt(Math.Pow(bmp.Height, 2) + Math.Pow(bmp.Width, 2));//Diagonal
-			
-			if(circles.Count == 0){
-				listBoxClosestCircles.Items.Add("There is no point");
-			}
-			else if(circles.Count == 1){
-				listBoxClosestCircles.Items.Add("There is only one point");
-			}
-			else{
-				foreach(Circle c in circles){
-					foreach(Circle closest in circles){
-						if(c.getId() != closest.getId()){
-							currentDistance = calculateDistance(c.getX(), c.getY(), closest.getX(), closest.getY());
-							if(currentDistance < minDistance){
-								closestPoint.X = c.getId();
-								closestPoint.Y = closest.getId();
-								minDistance = currentDistance;
-								x1 = c.getX();
-								y1 = c.getY();
-								x2 = closest.getX();
-								y2 = closest.getY();
-							}
-						}
-					}
+			double weight;
+			Vertex v = null, u  = null;
+			mstKruskal = new Graph();
+			List<Tuple<Circle,Circle>> krkRepresentation= new List<Tuple<Circle,Circle>>();
+			krkRepresentation= kruskal();
+			listBoxKruskalEdges.Items.Clear();
+			for(int i = 0; i < krkRepresentation.Count; i++){
+				u = mstKruskal.findVertex(krkRepresentation[i].Item1);
+				v = mstKruskal.findVertex(krkRepresentation[i].Item2);
+				if(u == null && v == null){
+					weight = calculateDistance(krkRepresentation[i].Item1.getX(),krkRepresentation[i].Item1.getY(),
+					                           krkRepresentation[i].Item2.getX(),krkRepresentation[i].Item2.getY());
+					mstKruskal.addVertex(krkRepresentation[i].Item1);
+					mstKruskal.addVertex(krkRepresentation[i].Item2);
+					mstKruskal.addEdge(krkRepresentation[i].Item1,krkRepresentation[i].Item2,weight);
 				}
-				markPoint(x1,y1,closestPoint.X,true);
-				markPoint(x2,y2,closestPoint.Y,true);
-				representation = "The closest point is (" + closestPoint.X + ", " + closestPoint.Y + ")." + '\n';
-				listBoxClosestCircles.Items.Add(representation);
-				representation = "Euclidian distance: " + minDistance + '\n';		
-				listBoxClosestCircles.Items.Add(representation);				
+				else if(u == null){
+					weight = calculateDistance(krkRepresentation[i].Item1.getX(),krkRepresentation[i].Item1.getY(),
+					                           v.getData().getX(),v.getData().getY());	
+					mstKruskal.addVertex(krkRepresentation[i].Item1);
+					mstKruskal.addEdge(krkRepresentation[i].Item1,v.getData(),weight);
+				}
+				else{
+					weight = calculateDistance(u.getData().getX(),u.getData().getY(),
+					                           krkRepresentation[i].Item2.getX(),krkRepresentation[i].Item2.getY());
+					mstKruskal.addVertex(krkRepresentation[i].Item2);
+					mstKruskal.addEdge(u.getData(),krkRepresentation[i].Item2,weight);
+				}
+				printLine(true, krkRepresentation[i].Item1.getX(),krkRepresentation[i].Item1.getY(), krkRepresentation[i].Item2.getX(),krkRepresentation[i].Item2.getY());
+				representation = "(" + krkRepresentation[i].Item1.getId() + ", " + krkRepresentation[i].Item2.getId() + ")" + '\n';
+				listBoxKruskalEdges.Items.Add(representation);
+			}
+			listBoxWeightKruskal.Items.Clear();
+			listBoxWeightKruskal.Items.Add(mstKruskal.getWeight().ToString());
+			int j;
+			j = 0;
+			treeViewMstKruskal.Nodes.Clear();
+			foreach(Vertex ver in mstKruskal.getVertices()){
+				if(ver.getAdjacencyList().Count > 0){
+					treeViewMstKruskal.Nodes.Add(ver.getData().getId().ToString());
+					foreach(Edge e in ver.getAdjacencyList()){
+						treeViewMstKruskal.Nodes[j].Nodes.Add(e.toString());
+					}
+					j++;	
+				}
 			}
 		}
-		
+
 		void binarized(){
 			for (int i = 0; i < bmp.Height - 1; i++)
                 for (int j = 0; j < bmp.Width - 1; j++)
@@ -375,6 +381,20 @@ namespace pSALG
 			bmp.SetPixel(x-1,y+1,Color.Yellow);
 		}
 		
+		void printLine(Boolean mst, int x1, int y1, int x2, int y2){
+			Graphics g = Graphics.FromImage(bmp); 
+			Pen pen;
+			if(!mst){
+				pen = new Pen(Color.Green,1);	
+			}
+			else{
+				pen = new Pen(Color.Red,3);
+			}
+			PointF p1 = new PointF(x1,y1);
+			PointF p2 = new PointF(x2,y2);
+			g.DrawLine(pen,p1,p2);
+		}
+		
 		void printGraph(){
 			int i;
 			i = 0;
@@ -387,5 +407,6 @@ namespace pSALG
 				i++;
 			}
 		}
+
 	}
 }
