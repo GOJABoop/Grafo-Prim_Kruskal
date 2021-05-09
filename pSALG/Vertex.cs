@@ -12,6 +12,11 @@ namespace pSALG
 			this.adjacencyList = new List<Edge>();
 		}
 		
+		public Vertex(Vertex s){
+			this.data = s.getData();
+			this.adjacencyList = s.getAdjacencyList();
+		}
+		
 		public Circle  getData(){
 			return data;
 		}

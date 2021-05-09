@@ -38,6 +38,8 @@ namespace pSALG
 		private System.Windows.Forms.ListBox listBoxWeightPrim;
 		private System.Windows.Forms.ListBox listBoxMstCreatedPrim;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Button buttonExecutePrim;
+		private System.Windows.Forms.TextBox textBoxStartVertexPrim;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -81,6 +83,8 @@ namespace pSALG
 			this.listBoxWeightPrim = new System.Windows.Forms.ListBox();
 			this.listBoxMstCreatedPrim = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.buttonExecutePrim = new System.Windows.Forms.Button();
+			this.textBoxStartVertexPrim = new System.Windows.Forms.TextBox();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxShowImage)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -148,12 +152,12 @@ namespace pSALG
 			// 
 			// listBoxKruskalEdges
 			// 
-			this.listBoxKruskalEdges.Font = new System.Drawing.Font("Miriam Mono CLM", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+			this.listBoxKruskalEdges.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
 			this.listBoxKruskalEdges.FormattingEnabled = true;
-			this.listBoxKruskalEdges.ItemHeight = 18;
+			this.listBoxKruskalEdges.ItemHeight = 20;
 			this.listBoxKruskalEdges.Location = new System.Drawing.Point(964, 39);
 			this.listBoxKruskalEdges.Name = "listBoxKruskalEdges";
-			this.listBoxKruskalEdges.Size = new System.Drawing.Size(93, 220);
+			this.listBoxKruskalEdges.Size = new System.Drawing.Size(93, 204);
 			this.listBoxKruskalEdges.TabIndex = 8;
 			// 
 			// labelSelectImage
@@ -191,12 +195,12 @@ namespace pSALG
 			// 
 			// listBoxPrim
 			// 
-			this.listBoxPrim.Font = new System.Drawing.Font("Miriam Mono CLM", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
+			this.listBoxPrim.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(177)));
 			this.listBoxPrim.FormattingEnabled = true;
-			this.listBoxPrim.ItemHeight = 18;
+			this.listBoxPrim.ItemHeight = 20;
 			this.listBoxPrim.Location = new System.Drawing.Point(964, 371);
 			this.listBoxPrim.Name = "listBoxPrim";
-			this.listBoxPrim.Size = new System.Drawing.Size(93, 220);
+			this.listBoxPrim.Size = new System.Drawing.Size(93, 204);
 			this.listBoxPrim.TabIndex = 14;
 			// 
 			// labelOrderEdgesPrim
@@ -303,11 +307,30 @@ namespace pSALG
 			this.label1.TabIndex = 26;
 			this.label1.Text = "Select a vertex to start Prim\'s algorithm";
 			// 
+			// buttonExecutePrim
+			// 
+			this.buttonExecutePrim.Location = new System.Drawing.Point(522, 632);
+			this.buttonExecutePrim.Name = "buttonExecutePrim";
+			this.buttonExecutePrim.Size = new System.Drawing.Size(141, 31);
+			this.buttonExecutePrim.TabIndex = 27;
+			this.buttonExecutePrim.Text = "Execute Prim";
+			this.buttonExecutePrim.UseVisualStyleBackColor = true;
+			this.buttonExecutePrim.Click += new System.EventHandler(this.ButtonExecutePrimClick);
+			// 
+			// textBoxStartVertexPrim
+			// 
+			this.textBoxStartVertexPrim.Location = new System.Drawing.Point(538, 590);
+			this.textBoxStartVertexPrim.Name = "textBoxStartVertexPrim";
+			this.textBoxStartVertexPrim.Size = new System.Drawing.Size(100, 26);
+			this.textBoxStartVertexPrim.TabIndex = 28;
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1069, 689);
+			this.Controls.Add(this.textBoxStartVertexPrim);
+			this.Controls.Add(this.buttonExecutePrim);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.listBoxMstCreatedPrim);
 			this.Controls.Add(this.listBoxWeightPrim);
@@ -337,6 +360,7 @@ namespace pSALG
 			this.Text = "pSALG";
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxShowImage)).EndInit();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 	}

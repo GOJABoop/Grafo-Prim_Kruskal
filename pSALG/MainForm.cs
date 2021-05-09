@@ -8,10 +8,13 @@ namespace pSALG
 	public partial class MainForm : Form
 	{
 		List<Circle> circles;
-		List<KeyValuePair<double,Tuple<Vertex,Circle>>> edges;
+		List<KeyValuePair<double,Tuple<Circle,Circle>>> edges;
+		List<KeyValuePair<double,Tuple<Circle,Circle>>> candidates;
 		Graph graph;
 		Graph mstKruskal;
+		Graph mstPrim;
 		Bitmap bmp;
+		int countMst;
 		
 		public MainForm(){
 			InitializeComponent();
@@ -27,16 +30,21 @@ namespace pSALG
 		}
 		
 		void ButtonAnalizeClick(object sender, EventArgs e){
+			try{
 				circles = new List<Circle>();
 				graph = new Graph();
 				bmp = new Bitmap(openFileDialogToSearchFile.FileName);
 				pictureBoxShowImage.Image = bmp;
+				clearAllListBox();
 				binarized();
 				searchCircles();
 				addVertices();
 				searchEdges();
 				printGraph();
 				kruskalProcedure();
+			}catch(Exception){
+				MessageBox.Show("No image has been selected");
+			}
 			
 		}
 		
@@ -78,8 +86,7 @@ namespace pSALG
 					   	break;
 					}
 				}
-			}
-			return edge;	
+			} return edge;	
 		}
 		
 		Boolean isEdge(int x, int y){
@@ -92,8 +99,7 @@ namespace pSALG
 				   	edge = true;
 				   	break;
 				}
-			}
-			return edge;
+			} return edge;
 		}
 		
 		Boolean contains(Circle c){
@@ -102,8 +108,7 @@ namespace pSALG
 				   (data.getY()-5 <= c.getY() && c.getY() <= (data.getY() + (int)data.getRadio()))){
 					return  true;	
 				}
-			}
-			return false;
+			}return false;
 		}
 		
 		Boolean isOutOfCircles(int x, int y,int x1, int y1, double sRadio, int x2, int y2, double dRadio){
@@ -156,7 +161,31 @@ namespace pSALG
 			printLine(false,x1,y1,x2,y2);
 			return false;
 		}
-
+		
+		Boolean isFeasible(KeyValuePair<double,Tuple<Circle,Circle>> e, List<Vertex> s){
+			Boolean v_1 = false, v_2 = false;
+			foreach(Vertex v in s){
+				if(v.getData().Equals(e.Value.Item1)){
+					v_1 = true;
+				}
+				if(v.getData().Equals(e.Value.Item2)){
+					v_2 = true;
+				}
+			}
+			if(v_1 && v_2){
+				return false;
+			}
+			return true;
+		}
+		
+		Boolean belongsTo(Circle e, List<Vertex> s){
+			foreach(Vertex v in s){
+				if(v.getData() == e){
+					return true;
+				}
+			}return false;
+		}
+		
 		Circle defineData(int j, int i){ //(x,y) 
 			Circle c = new Circle();
 			double radio;
@@ -251,7 +280,7 @@ namespace pSALG
 		
 		void searchEdges(){
 			Circle s = new Circle(); //s = source
-			edges = new List<KeyValuePair<double, Tuple<Vertex, Circle>>>();
+			edges = new List<KeyValuePair<double, Tuple<Circle, Circle>>>();
 			double weight;
 			foreach(Vertex v in graph.getVertices()){
 				s = circles.Find(d=>d.getId()==v.getData().getId());
@@ -260,7 +289,7 @@ namespace pSALG
 						if(!thereIsObstacle(s.getX(),s.getY(),s.getRadio(),c.getX(),c.getY(),c.getRadio())){
 							try{
 								weight = calculateDistance(s.getX(),s.getY(),c.getX(),c.getY());
-								edges.Add(new KeyValuePair<double, Tuple<Vertex, Circle>>(weight,new Tuple<Vertex,Circle>(v,c)));
+								edges.Add(new KeyValuePair<double, Tuple<Circle, Circle>>(weight,new Tuple<Circle,Circle>(s,c)));
 								graph.addEdge(s,c,weight); //(source, destination, weight)
 							}catch(Exception ex){
 								MessageBox.Show(ex.ToString());
@@ -280,11 +309,11 @@ namespace pSALG
 			}
 			edges.Sort((x,y) => x.Key.CompareTo(y.Key));
 			for(int i = 0; i < edges.Count; i++){
-				u = edges[i].Value.Item1.getData().getId()-1;
+				u = edges[i].Value.Item1.getId()-1;
 				v = edges[i].Value.Item2.getId()-1;
 				if(u != v){
 					if(sets.findSet(u) != sets.findSet(v)){
-						kruskalEdges.Add(new Tuple<Circle,Circle>(edges[i].Value.Item1.getData(),edges[i].Value.Item2));
+						kruskalEdges.Add(new Tuple<Circle,Circle>(edges[i].Value.Item1,edges[i].Value.Item2));
 						sets.union(u,v);
 					}
 				}
@@ -296,41 +325,41 @@ namespace pSALG
 			string representation;
 			double weight;
 			Vertex v = null, u  = null;
+			Circle s = new Circle();
+			Circle d = new Circle();
 			mstKruskal = new Graph();
 			List<Tuple<Circle,Circle>> krkRepresentation= new List<Tuple<Circle,Circle>>();
+			
 			krkRepresentation= kruskal();
-			listBoxKruskalEdges.Items.Clear();
 			for(int i = 0; i < krkRepresentation.Count; i++){
-				u = mstKruskal.findVertex(krkRepresentation[i].Item1);
-				v = mstKruskal.findVertex(krkRepresentation[i].Item2);
+				s = krkRepresentation[i].Item1;
+				d = krkRepresentation[i].Item2;
+				u = mstKruskal.findVertex(s);
+				v = mstKruskal.findVertex(d);
 				if(u == null && v == null){
-					weight = calculateDistance(krkRepresentation[i].Item1.getX(),krkRepresentation[i].Item1.getY(),
-					                           krkRepresentation[i].Item2.getX(),krkRepresentation[i].Item2.getY());
-					mstKruskal.addVertex(krkRepresentation[i].Item1);
-					mstKruskal.addVertex(krkRepresentation[i].Item2);
-					mstKruskal.addEdge(krkRepresentation[i].Item1,krkRepresentation[i].Item2,weight);
+					weight = calculateDistance(s.getX(),s.getY(),d.getX(),d.getY());
+					mstKruskal.addVertex(s);
+					mstKruskal.addVertex(d);
+					mstKruskal.addEdge(s,d,weight);
 				}
 				else if(u == null){
-					weight = calculateDistance(krkRepresentation[i].Item1.getX(),krkRepresentation[i].Item1.getY(),
-					                           v.getData().getX(),v.getData().getY());	
-					mstKruskal.addVertex(krkRepresentation[i].Item1);
-					mstKruskal.addEdge(krkRepresentation[i].Item1,v.getData(),weight);
+					weight = calculateDistance(s.getX(),s.getY(),d.getX(),d.getY());	
+					mstKruskal.addVertex(s);
+					mstKruskal.addEdge(s,d,weight);
 				}
 				else{
-					weight = calculateDistance(u.getData().getX(),u.getData().getY(),
-					                           krkRepresentation[i].Item2.getX(),krkRepresentation[i].Item2.getY());
-					mstKruskal.addVertex(krkRepresentation[i].Item2);
-					mstKruskal.addEdge(u.getData(),krkRepresentation[i].Item2,weight);
+					weight = calculateDistance(s.getX(),s.getY(),d.getX(),d.getY());
+					mstKruskal.addVertex(d);
+					mstKruskal.addEdge(s,d,weight);
 				}
-				printLine(true, krkRepresentation[i].Item1.getX(),krkRepresentation[i].Item1.getY(), krkRepresentation[i].Item2.getX(),krkRepresentation[i].Item2.getY());
-				representation = "(" + krkRepresentation[i].Item1.getId() + ", " + krkRepresentation[i].Item2.getId() + ")" + '\n';
+				printLine(true, s.getX(),s.getY(), d.getX(),d.getY());
+				representation = "(" + s.getId() + ", " + d.getId() + ")" + '\n';
 				listBoxKruskalEdges.Items.Add(representation);
 			}
-			listBoxWeightKruskal.Items.Clear();
 			listBoxWeightKruskal.Items.Add(mstKruskal.getWeight().ToString());
 			int j;
 			j = 0;
-			treeViewMstKruskal.Nodes.Clear();
+			mstCreated();
 			foreach(Vertex ver in mstKruskal.getVertices()){
 				if(ver.getAdjacencyList().Count > 0){
 					treeViewMstKruskal.Nodes.Add(ver.getData().getId().ToString());
@@ -342,6 +371,65 @@ namespace pSALG
 			}
 		}
 
+		
+		List<KeyValuePair<double,Tuple<Circle,Circle>>> prim(Vertex v_i){
+			List<Vertex> s = new List<Vertex>();
+			candidates = new List<KeyValuePair<double,Tuple<Circle,Circle>>>();
+			KeyValuePair<double,Tuple<Circle,Circle>> e;
+			List<KeyValuePair<double,Tuple<Circle,Circle>>> mst = new List<KeyValuePair<double,Tuple<Circle,Circle>>>();
+			Circle c1 = new Circle();
+			Circle c2 = new Circle();
+			Vertex v1;
+			addCandidates(v_i);
+			s.Add(v_i);
+			while( s.Count < graph.getVertexCount() && candidates.Count > 0){
+				e = new KeyValuePair<double,Tuple<Circle,Circle>>(0,new Tuple<Circle,Circle>(c1,c2));
+				e = selectBestEdge();
+				if(isFeasible(e,s)){
+					mst.Add(e);
+					if(belongsTo(e.Value.Item1,s)){
+						v1 = graph.findVertex(e.Value.Item2);
+						s.Add(v1);
+						addCandidates(v1);	
+					}
+					else{
+						v1 = graph.findVertex(e.Value.Item1);
+						s.Add(v1);
+						addCandidates(v1);
+					}
+				}
+				candidates.RemoveAt(candidates.IndexOf(e));
+			}
+			return mst;
+		}
+		
+		void addCandidates(Vertex vertex){
+			Circle c1;
+			Circle c2;
+			if(vertex != null){
+				c1 = vertex.getData();
+				foreach(Edge e in vertex.getAdjacencyList()){
+					c2 = e.getDestination().getData();
+					candidates.Add(new KeyValuePair<double, Tuple<Circle, Circle>>(e.getWeight(),new Tuple<Circle,Circle>(c1,c2)));
+				}	
+			}
+		}
+		
+		KeyValuePair<double,Tuple<Circle,Circle>> selectBestEdge(){
+			Circle c1 = new Circle();
+			Circle c2 = new Circle();
+			KeyValuePair<double,Tuple<Circle,Circle>> best = new KeyValuePair<double,Tuple<Circle,Circle>>(0,new Tuple<Circle,Circle>(c1,c2));
+			double min;
+			min = double.MaxValue;
+			foreach(KeyValuePair<double,Tuple<Circle,Circle>> index in candidates){
+				if(index.Key < min){
+					best = index;
+					min = index.Key;
+				}
+			}
+			return best;
+		}
+		
 		void binarized(){
 			for (int i = 0; i < bmp.Height - 1; i++)
                 for (int j = 0; j < bmp.Width - 1; j++)
@@ -381,6 +469,116 @@ namespace pSALG
 			bmp.SetPixel(x-1,y+1,Color.Yellow);
 		}
 		
+		void printGraph(){
+			int i;
+			i = 0;
+			foreach(Vertex v in graph.getVertices()){
+				treeViewGraph.Nodes.Add(v.getData().getId().ToString());
+				foreach(Edge e in v.getAdjacencyList()){
+					treeViewGraph.Nodes[i].Nodes.Add(e.toString());
+				}
+				i++;
+			}
+		}
+		
+		void ButtonExecutePrimClick(object sender, EventArgs e){
+			Vertex v_i;
+			Circle start = new Circle();
+			List<KeyValuePair<double,Tuple<Circle,Circle>>> primRepresentation = new List<KeyValuePair<double, Tuple<Circle,Circle>>>();
+			start.setId(Convert.ToInt32(textBoxStartVertexPrim.Text));
+			v_i = graph.findVertex(start);
+			if(v_i != null){
+				primRepresentation = prim(v_i);
+				primProcedure(primRepresentation);
+			}
+			else{
+				MessageBox.Show("Vertex does not exists");
+			}
+		}
+		
+		void mstCreated(){
+			countMst = 0;
+			int count;
+			count = 0;
+			Boolean[] flags = new Boolean[graph.getVertexCount()];
+			foreach(Vertex v in graph.getVertices()){
+				if(!flags[v.getData().getId()-1]){
+					flags[v.getData().getId()-1] = true;
+					foreach(Edge e in v.getAdjacencyList()){
+						if(!flags[e.getDestination().getData().getId()-1]){
+							flags[e.getDestination().getData().getId()-1] = true;
+							count++;
+						}
+						else{
+							break;
+						}
+					}
+					if(count == v.getAdjacencyList().Count){
+						countMst++;
+					}
+					count = 0;
+				}
+			}
+			listBoxMstCreatedKruskal.Items.Add(countMst);
+		}
+		
+		void primProcedure(List<KeyValuePair<double,Tuple<Circle,Circle>>> primRepresentation){
+			string representation;
+			Vertex v = null, u  = null;
+			Circle s = new Circle();
+			Circle d = new Circle();
+			mstPrim = new Graph();
+			
+			for(int i = 0; i < primRepresentation.Count; i++){
+				s = primRepresentation[i].Value.Item1;
+				d = primRepresentation[i].Value.Item2;
+				u = mstPrim.findVertex(s);
+				v = mstPrim.findVertex(d);
+				if(u == null && v == null){
+					mstPrim.addVertex(s);
+					mstPrim.addVertex(d);
+					mstPrim.addEdge(s,d,primRepresentation[i].Key);
+				}
+				else if(u == null){	
+					mstPrim.addVertex(s);
+					mstPrim.addEdge(s,d,primRepresentation[i].Key);
+				}
+				else{
+					mstPrim.addVertex(d);
+					mstPrim.addEdge(s,d,primRepresentation[i].Key);
+				}
+				//printLine(true, s.getX(),s.getY(), d.getX(),d.getY());
+				
+				Graphics g = Graphics.FromImage(bmp);
+				Pen pen = new Pen(Color.BlueViolet,3);
+				PointF p1 = new PointF(s.getX()-5,s.getY()-5);
+				PointF p2 = new PointF(d.getX()-5,d.getY()-5);
+				g.DrawLine(pen,p1,p2);
+				g.Flush();
+				representation = "(" + s.getId() + ", " + d.getId() + ")" + '\n';
+				listBoxPrim.Items.Add(representation);
+			}
+			
+			listBoxWeightPrim.Items.Add(mstPrim.getWeight().ToString());
+			int j;
+			j = 0;
+			foreach(Vertex ver in mstPrim.getVertices()){
+				if(ver.getAdjacencyList().Count > 0){
+					treeViewMstPrim.Nodes.Add(ver.getData().getId().ToString());
+					foreach(Edge e in ver.getAdjacencyList()){
+						treeViewMstPrim.Nodes[j].Nodes.Add(e.toString());
+					}
+					j++;	
+				}
+			}
+			if(countMst == 1){
+				listBoxMstCreatedPrim.Items.Add(countMst);
+			}
+			else{
+				listBoxMstCreatedPrim.Items.Add("1, (" + countMst + " possible)");
+			}
+		}
+		
 		void printLine(Boolean mst, int x1, int y1, int x2, int y2){
 			Graphics g = Graphics.FromImage(bmp); 
 			Pen pen;
@@ -395,18 +593,19 @@ namespace pSALG
 			g.DrawLine(pen,p1,p2);
 		}
 		
-		void printGraph(){
-			int i;
-			i = 0;
+		void clearAllListBox(){
 			treeViewGraph.Nodes.Clear();
-			foreach(Vertex v in graph.getVertices()){
-				treeViewGraph.Nodes.Add(v.getData().getId().ToString());
-				foreach(Edge e in v.getAdjacencyList()){
-					treeViewGraph.Nodes[i].Nodes.Add(e.toString());
-				}
-				i++;
-			}
+			
+			treeViewMstKruskal.Nodes.Clear();
+			listBoxMstCreatedKruskal.Items.Clear();
+			listBoxWeightKruskal.Items.Clear();
+			listBoxKruskalEdges.Items.Clear();
+			
+			treeViewMstPrim.Nodes.Clear();
+			listBoxPrim.Items.Clear();
+			listBoxMstCreatedPrim.Items.Clear();
+			listBoxWeightPrim.Items.Clear();
+						
 		}
-
 	}
 }
