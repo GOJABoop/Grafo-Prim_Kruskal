@@ -32,6 +32,7 @@ namespace pSALG
 		public Edge getEdgeAt(int i){
 			return adjacencyList[i];
 		}
+		
 		public string toString(){
 			string connection;
 			connection = data.getId() + "->";

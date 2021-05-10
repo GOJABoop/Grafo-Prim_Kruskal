@@ -14,7 +14,9 @@ namespace pSALG
 		Graph mstKruskal;
 		Graph mstPrim;
 		Bitmap bmp;
-		int countMst;
+		Boolean[] flags;
+		int countMstKruskal;
+		int countMstPrim;
 		
 		public MainForm(){
 			InitializeComponent();
@@ -44,8 +46,7 @@ namespace pSALG
 				kruskalProcedure();
 			}catch(Exception){
 				MessageBox.Show("No image has been selected");
-			}
-			
+			}	
 		}
 		
 		Boolean isBlack(Color color){ 
@@ -359,7 +360,7 @@ namespace pSALG
 			listBoxWeightKruskal.Items.Add(mstKruskal.getWeight().ToString());
 			int j;
 			j = 0;
-			mstCreated();
+			mstCreatedKruskal(krkRepresentation.Count);
 			foreach(Vertex ver in mstKruskal.getVertices()){
 				if(ver.getAdjacencyList().Count > 0){
 					treeViewMstKruskal.Nodes.Add(ver.getData().getId().ToString());
@@ -371,7 +372,6 @@ namespace pSALG
 			}
 		}
 
-		
 		List<KeyValuePair<double,Tuple<Circle,Circle>>> prim(Vertex v_i){
 			List<Vertex> s = new List<Vertex>();
 			candidates = new List<KeyValuePair<double,Tuple<Circle,Circle>>>();
@@ -400,6 +400,7 @@ namespace pSALG
 				}
 				candidates.RemoveAt(candidates.IndexOf(e));
 			}
+			countMstPrim++;
 			return mst;
 		}
 		
@@ -418,7 +419,8 @@ namespace pSALG
 		KeyValuePair<double,Tuple<Circle,Circle>> selectBestEdge(){
 			Circle c1 = new Circle();
 			Circle c2 = new Circle();
-			KeyValuePair<double,Tuple<Circle,Circle>> best = new KeyValuePair<double,Tuple<Circle,Circle>>(0,new Tuple<Circle,Circle>(c1,c2));
+			KeyValuePair<double,Tuple<Circle,Circle>> best 
+				= new KeyValuePair<double,Tuple<Circle,Circle>>(0,new Tuple<Circle,Circle>(c1,c2));
 			double min;
 			min = double.MaxValue;
 			foreach(KeyValuePair<double,Tuple<Circle,Circle>> index in candidates){
@@ -485,41 +487,61 @@ namespace pSALG
 			Vertex v_i;
 			Circle start = new Circle();
 			List<KeyValuePair<double,Tuple<Circle,Circle>>> primRepresentation = new List<KeyValuePair<double, Tuple<Circle,Circle>>>();
+			int j;
+			flags = new Boolean[graph.getVertexCount()];
+			mstPrim = new Graph();
+			countMstPrim = 0;
 			start.setId(Convert.ToInt32(textBoxStartVertexPrim.Text));
 			v_i = graph.findVertex(start);
+			treeViewMstPrim.Nodes.Clear();
+			listBoxPrim.Items.Clear();
+			listBoxMstCreatedPrim.Items.Clear();
+			listBoxWeightPrim.Items.Clear();
+				
 			if(v_i != null){
 				primRepresentation = prim(v_i);
 				primProcedure(primRepresentation);
+				if(mstPrim.getVertexCount() < graph.getVertexCount()){
+					makeForest();
+				}
+				listBoxMstCreatedPrim.Items.Add(countMstPrim);
+				listBoxWeightPrim.Items.Add(mstPrim.getWeight().ToString());
+				j = 0;
+				foreach(Vertex ver in mstPrim.getVertices()){
+					if(ver.getAdjacencyList().Count > 0){
+						treeViewMstPrim.Nodes.Add(ver.getData().getId().ToString());
+						foreach(Edge edge in ver.getAdjacencyList()){
+							treeViewMstPrim.Nodes[j].Nodes.Add(edge.toString());
+						}
+						j++;	
+					}
+				}
 			}
 			else{
 				MessageBox.Show("Vertex does not exists");
 			}
 		}
 		
-		void mstCreated(){
-			countMst = 0;
-			int count;
-			count = 0;
-			Boolean[] flags = new Boolean[graph.getVertexCount()];
-			foreach(Vertex v in graph.getVertices()){
-				if(!flags[v.getData().getId()-1]){
-					flags[v.getData().getId()-1] = true;
-					foreach(Edge e in v.getAdjacencyList()){
-						if(!flags[e.getDestination().getData().getId()-1]){
-							flags[e.getDestination().getData().getId()-1] = true;
-							count++;
-						}
-						else{
-							break;
-						}
-					}
-					if(count == v.getAdjacencyList().Count){
-						countMst++;
-					}
-					count = 0;
+		void makeForest(){
+			List<KeyValuePair<double,Tuple<Circle,Circle>>> primRepresentation = new List<KeyValuePair<double, Tuple<Circle,Circle>>>();
+			Circle c = new Circle();
+			for(int i = 0; i < graph.getVertexCount(); i++){
+				if(!flags[i]){
+					primRepresentation.Clear();
+					c.setId(i+1);
+					primRepresentation = prim(graph.findVertex(c));
+					primProcedure(primRepresentation);
 				}
 			}
-			listBoxMstCreatedKruskal.Items.Add(countMst);
+		}
+		
+		void markFlagVertex(Vertex v){
+			flags[v.getData().getId()-1] = true;
+		}
+		
+		void mstCreatedKruskal(int edgesInMst){
+			countMstKruskal = graph.getVertexCount()- edgesInMst;
+			listBoxMstCreatedKruskal.Items.Add(countMstKruskal);
 		}
 		
 		void primProcedure(List<KeyValuePair<double,Tuple<Circle,Circle>>> primRepresentation){
@@ -527,7 +549,6 @@ namespace pSALG
 			Vertex v = null, u  = null;
 			Circle s = new Circle();
 			Circle d = new Circle();
-			mstPrim = new Graph();
 			
 			for(int i = 0; i < primRepresentation.Count; i++){
 				s = primRepresentation[i].Value.Item1;
@@ -547,35 +568,10 @@ namespace pSALG
 					mstPrim.addVertex(d);
 					mstPrim.addEdge(s,d,primRepresentation[i].Key);
 				}
-				//printLine(true, s.getX(),s.getY(), d.getX(),d.getY());
-				
-				Graphics g = Graphics.FromImage(bmp);
-				Pen pen = new Pen(Color.BlueViolet,3);
-				PointF p1 = new PointF(s.getX()-5,s.getY()-5);
-				PointF p2 = new PointF(d.getX()-5,d.getY()-5);
-				g.DrawLine(pen,p1,p2);
-				g.Flush();
+				markFlagVertex(graph.findVertex(s));
+				markFlagVertex(graph.findVertex(d));
 				representation = "(" + s.getId() + ", " + d.getId() + ")" + '\n';
 				listBoxPrim.Items.Add(representation);
-			}
-			
-			listBoxWeightPrim.Items.Add(mstPrim.getWeight().ToString());
-			int j;
-			j = 0;
-			foreach(Vertex ver in mstPrim.getVertices()){
-				if(ver.getAdjacencyList().Count > 0){
-					treeViewMstPrim.Nodes.Add(ver.getData().getId().ToString());
-					foreach(Edge e in ver.getAdjacencyList()){
-						treeViewMstPrim.Nodes[j].Nodes.Add(e.toString());
-					}
-					j++;	
-				}
-			}
-			if(countMst == 1){
-				listBoxMstCreatedPrim.Items.Add(countMst);
-			}
-			else{
-				listBoxMstCreatedPrim.Items.Add("1, (" + countMst + " possible)");
 			}
 		}
 		
@@ -606,6 +602,14 @@ namespace pSALG
 			listBoxMstCreatedPrim.Items.Clear();
 			listBoxWeightPrim.Items.Clear();
 						
+		}
+		void ButtonExecuteKruskalClick(object sender, EventArgs e){
+			if(graph != null){
+				kruskalProcedure();
+			}
+			else{
+				MessageBox.Show("Empty graph");
+			}
 		}
 	}
 }
