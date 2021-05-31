@@ -40,6 +40,8 @@ namespace pSALG
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button buttonExecutePrim;
 		private System.Windows.Forms.TextBox textBoxStartVertexPrim;
+		private System.Windows.Forms.ComboBox comboBoxSelectAlgorithmToShow;
+		private System.Windows.Forms.Button buttonShowRepresentation;
 		
 		/// <summary>
 		/// Disposes resources used by the form.
@@ -85,6 +87,8 @@ namespace pSALG
 			this.label1 = new System.Windows.Forms.Label();
 			this.buttonExecutePrim = new System.Windows.Forms.Button();
 			this.textBoxStartVertexPrim = new System.Windows.Forms.TextBox();
+			this.comboBoxSelectAlgorithmToShow = new System.Windows.Forms.ComboBox();
+			this.buttonShowRepresentation = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBoxShowImage)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -171,6 +175,7 @@ namespace pSALG
 			// 
 			// treeViewGraph
 			// 
+			this.treeViewGraph.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.treeViewGraph.Location = new System.Drawing.Point(241, 485);
 			this.treeViewGraph.Name = "treeViewGraph";
 			this.treeViewGraph.Size = new System.Drawing.Size(244, 152);
@@ -216,6 +221,7 @@ namespace pSALG
 			// 
 			// treeViewMstKruskal
 			// 
+			this.treeViewMstKruskal.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.treeViewMstKruskal.ForeColor = System.Drawing.Color.Black;
 			this.treeViewMstKruskal.Location = new System.Drawing.Point(716, 40);
 			this.treeViewMstKruskal.Name = "treeViewMstKruskal";
@@ -333,11 +339,40 @@ namespace pSALG
 			this.textBoxStartVertexPrim.Size = new System.Drawing.Size(100, 26);
 			this.textBoxStartVertexPrim.TabIndex = 28;
 			// 
+			// comboBoxSelectAlgorithmToShow
+			// 
+			this.comboBoxSelectAlgorithmToShow.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.comboBoxSelectAlgorithmToShow.FormattingEnabled = true;
+			this.comboBoxSelectAlgorithmToShow.Items.AddRange(new object[] {
+			"Original",
+			"Kruskal",
+			"Prim",
+			"Both",
+			"Graph"});
+			this.comboBoxSelectAlgorithmToShow.Location = new System.Drawing.Point(35, 536);
+			this.comboBoxSelectAlgorithmToShow.Name = "comboBoxSelectAlgorithmToShow";
+			this.comboBoxSelectAlgorithmToShow.Size = new System.Drawing.Size(162, 28);
+			this.comboBoxSelectAlgorithmToShow.TabIndex = 29;
+			this.comboBoxSelectAlgorithmToShow.Text = "Original";
+			// 
+			// buttonShowRepresentation
+			// 
+			this.buttonShowRepresentation.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.buttonShowRepresentation.Location = new System.Drawing.Point(35, 570);
+			this.buttonShowRepresentation.Name = "buttonShowRepresentation";
+			this.buttonShowRepresentation.Size = new System.Drawing.Size(162, 26);
+			this.buttonShowRepresentation.TabIndex = 30;
+			this.buttonShowRepresentation.Text = "show representation";
+			this.buttonShowRepresentation.UseVisualStyleBackColor = true;
+			this.buttonShowRepresentation.Click += new System.EventHandler(this.ButtonShowRepresentationClick);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 20F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1069, 641);
+			this.Controls.Add(this.buttonShowRepresentation);
+			this.Controls.Add(this.comboBoxSelectAlgorithmToShow);
 			this.Controls.Add(this.textBoxStartVertexPrim);
 			this.Controls.Add(this.buttonExecutePrim);
 			this.Controls.Add(this.label1);

@@ -65,10 +65,10 @@ namespace pSALG
 			return false;
 		}
 		
-		Boolean isGreen(Color color){ 
-			if(color.R == 0)
+		Boolean isGray(Color color){ 
+			if(color.R == 128)
 				if(color.G == 128)
-					if(color.B == 0)
+					if(color.B == 128)
 						return true;
 			return false;
 		}
@@ -130,7 +130,7 @@ namespace pSALG
 		
 		Boolean thereIsObstacle(int x1, int y1, double sRadio, int x2, int y2, double dRadio){
 			double m, c, y, x;
-			int limit, difX;
+			int limit, difX,difY;
 			Color color;
 			//define equation menbers
 			m = c = 0;
@@ -138,28 +138,38 @@ namespace pSALG
 				m = ((double)y2-(double)y1)/((double)x2-(double)x1);
 				c = (-1 * (double)x1 * (double)m) + (double)y1;					
 			}
+			difY = Math.Abs(y1-y2);
 			difX = Math.Abs(x1-x2);
-			if(difX <= 14){
+			if(x1 == x2){
 				limit =	limit = Math.Max(y1,y2);
 				x = Math.Min(x1,x2);
 				for(y = Math.Min(y1,y2); y < limit; y++){
 					color = bmp.GetPixel((int)x,(int)y);
-					if(!isGreen(color) && !isWhite(color) && isOutOfCircles((int)x,(int)y,x1,y1,sRadio,x2,y2,dRadio)){
+					if(!isGray(color) && !isWhite(color) && isOutOfCircles((int)x,(int)y,x1,y1,sRadio,x2,y2,dRadio)){
+						return true;
+					}
+				}
+			}
+			else if(difX <= difY && (int)m != 0){
+				limit = Math.Max(y1,y2);
+				for(y = Math.Min(y1,y2); y < limit; y++){
+					x = ((double)y/(double)m)-((double)y1/(double)m)+(double)x1;
+					color = bmp.GetPixel((int)x,(int)y);
+					if(!isGray(color) && !isWhite(color) && isOutOfCircles((int)x,(int)y,x1,y1,sRadio,x2,y2,dRadio)){
 						return true;
 					}
 				}
 			}
 			else{
-				limit = Math.Max(x1,x2);//search an obstacle
+				limit = Math.Max(x1,x2);
 				for(x = Math.Min(x1,x2); x < limit; x++){
 					y = ((double)m * (double)x) + (double)c;
 					color = bmp.GetPixel((int)x,(int)y);
-					if(!isGreen(color) && !isWhite(color) && isOutOfCircles((int)x,(int)y,x1,y1,sRadio,x2,y2,dRadio)){
+					if(!isGray(color) && !isWhite(color) && isOutOfCircles((int)x,(int)y,x1,y1,sRadio,x2,y2,dRadio)){
 						return true;
 					}
 				}
 			}
-			printLine(false,x1,y1,x2,y2);
 			return false;
 		}
 		
@@ -268,9 +278,7 @@ namespace pSALG
 					}
 				}
 			}
-			foreach(Circle cir in circles){
-				markPoint(cir.getX(),cir.getY(),cir.getId(),false);
-			}
+			printCirclesOnImage(false);
 		}
 		
 		void addVertices(){
@@ -353,7 +361,6 @@ namespace pSALG
 					mstKruskal.addVertex(d);
 					mstKruskal.addEdge(s,d,weight);
 				}
-				printLine(true, s.getX(),s.getY(), d.getX(),d.getY());
 				representation = "(" + s.getId() + ", " + d.getId() + ")" + '\n';
 				listBoxKruskalEdges.Items.Add(representation);
 			}
@@ -440,7 +447,7 @@ namespace pSALG
 		}
 		
 		void markPoint(int x, int y, int id, Boolean isForClosest){
-			Graphics g = Graphics.FromImage(bmp); 
+			Graphics g =  Graphics.FromImage(bmp);
 			Font = new Font("Microsoft Sans Serif", 17, FontStyle.Regular, GraphicsUnit.Pixel);
 			
 			g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -478,9 +485,29 @@ namespace pSALG
 				treeViewGraph.Nodes.Add(v.getData().getId().ToString());
 				foreach(Edge e in v.getAdjacencyList()){
 					treeViewGraph.Nodes[i].Nodes.Add(e.toString());
+					printLine(0,v.getData().getX(),v.getData().getY(),e.getDestination().getData().getX(),e.getDestination().getData().getY());
 				}
 				i++;
 			}
+		}
+		
+		void printLine(int mst, int x1, int y1, int x2, int y2){
+			Graphics g = Graphics.FromImage(bmp); 
+			Pen pen;
+			if(mst == 1){//Prim
+				pen = new Pen(Color.Yellow,4);	
+			}
+			else if(mst ==2){//kruskal
+				pen = new Pen(Color.Red,4);
+			}
+			else{
+				pen = new Pen(Color.Gray,1);
+			}
+			
+			PointF p1 = new PointF(x1,y1);
+			PointF p2 = new PointF(x2,y2);
+			g.DrawLine(pen,p1,p2);
+			pictureBoxShowImage.Image = bmp;
 		}
 		
 		void ButtonExecutePrimClick(object sender, EventArgs e){
@@ -575,20 +602,6 @@ namespace pSALG
 			}
 		}
 		
-		void printLine(Boolean mst, int x1, int y1, int x2, int y2){
-			Graphics g = Graphics.FromImage(bmp); 
-			Pen pen;
-			if(!mst){
-				pen = new Pen(Color.Green,1);	
-			}
-			else{
-				pen = new Pen(Color.Red,3);
-			}
-			PointF p1 = new PointF(x1,y1);
-			PointF p2 = new PointF(x2,y2);
-			g.DrawLine(pen,p1,p2);
-		}
-		
 		void clearAllListBox(){
 			treeViewGraph.Nodes.Clear();
 			
@@ -603,13 +616,79 @@ namespace pSALG
 			listBoxWeightPrim.Items.Clear();
 						
 		}
-		void ButtonExecuteKruskalClick(object sender, EventArgs e){
-			if(graph != null){
-				kruskalProcedure();
+		
+		void ButtonShowRepresentationClick(object sender, EventArgs e){
+			int index = comboBoxSelectAlgorithmToShow.SelectedIndex;
+			try{
+				bmp = new Bitmap(openFileDialogToSearchFile.FileName);
+				if(index == 0){
+					if(circles.Count > 0){
+						printCirclesOnImage(false);	
+					}
+				}
+				else if(index == 1){
+					if(mstKruskal != null){
+						printGraphOnImage();
+						foreach(Vertex v in mstKruskal.getVertices()){
+							foreach(Edge edge in v.getAdjacencyList()){
+								printLine(2,v.getData().getX(),v.getData().getY(),edge.getDestination().getData().getX(),edge.getDestination().getData().getY());
+							}
+						}
+						pictureBoxShowImage.Image = bmp;
+					}
+				}
+				else if(index == 2){
+					if(mstKruskal != null){
+						printGraphOnImage();
+						foreach(Vertex v in mstPrim.getVertices()){
+							foreach(Edge edge in v.getAdjacencyList()){
+								printLine(1,v.getData().getX(),v.getData().getY(),edge.getDestination().getData().getX(),edge.getDestination().getData().getY());
+							}
+						}
+						pictureBoxShowImage.Image = bmp;
+					}
+				}
+				else if(index == 3){
+					if(mstKruskal != null && mstPrim != null){
+						printGraphOnImage();
+						foreach(Vertex v in mstKruskal.getVertices()){
+							foreach(Edge edge in v.getAdjacencyList()){
+								printLine(2,v.getData().getX()-5,v.getData().getY()-5,edge.getDestination().getData().getX()-5,edge.getDestination().getData().getY()-5);
+							}
+						}
+						foreach(Vertex v in mstPrim.getVertices()){
+							foreach(Edge edge in v.getAdjacencyList()){
+								printLine(1,v.getData().getX(),v.getData().getY(),edge.getDestination().getData().getX(),edge.getDestination().getData().getY());
+							}
+						}
+						pictureBoxShowImage.Image = bmp;	
+					}
+				}
+				else{
+					if(graph != null){
+						printGraphOnImage();
+					}
+				}				
+			}catch(Exception){
+				MessageBox.Show("Nothing to do");
 			}
-			else{
-				MessageBox.Show("Empty graph");
+		}
+		
+		void printCirclesOnImage(Boolean printClosestPoints){
+			foreach(Circle cir in circles){
+				markPoint(cir.getX(),cir.getY(),cir.getId(),printClosestPoints);
 			}
+			pictureBoxShowImage.Image = bmp;
+		}
+		
+		void printGraphOnImage(){
+			printCirclesOnImage(false);
+			foreach(Vertex v in graph.getVertices()){
+				foreach(Edge edge in v.getAdjacencyList()){
+					printLine(0,v.getData().getX(),v.getData().getY(),edge.getDestination().getData().getX(),edge.getDestination().getData().getY());
+				}
+			}
+			pictureBoxShowImage.Image = bmp;
 		}
 	}
 }
