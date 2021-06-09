@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Circle.cs" />
+    <Compile Include="DijkstraElement.cs" />
     <Compile Include="DisjointSet.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="Graph.cs" />
