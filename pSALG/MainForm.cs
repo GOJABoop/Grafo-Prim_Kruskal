@@ -11,6 +11,8 @@ namespace pSALG
 		Graph graph;
 		DijkstraElement[] dijkstraElements;
 		Bitmap bmp;
+		int clicks;
+		int sourceIndex;
 		
 		public MainForm(){
 			InitializeComponent();
@@ -31,6 +33,7 @@ namespace pSALG
 				graph = new Graph();
 				bmp = new Bitmap(openFileDialogToSearchFile.FileName);
 				pictureBoxShowImage.Image = bmp;
+				clicks = sourceIndex = 0;
 				clearAllListBox();
 				binarized();
 				searchCircles();
@@ -299,6 +302,7 @@ namespace pSALG
 				colorCenter(x,y);
 			}
 			g.Flush();
+			pictureBoxShowImage.Image= bmp;
 		}
 		
 		void colorCenter(int x, int y){
@@ -332,7 +336,7 @@ namespace pSALG
 			Graphics g = Graphics.FromImage(bmp); 
 			Pen pen;
 			if(mst == 1){
-				pen = new Pen(Color.Red,4);	
+				pen = new Pen(Color.Red,5);	
 			}
 			else{
 				pen = new Pen(Color.Gray,2);
@@ -344,7 +348,8 @@ namespace pSALG
 		}
 	
 		void clearAllListBox(){
-			treeViewGraph.Nodes.Clear();			
+			treeViewGraph.Nodes.Clear();
+			listBoxShortestPaths.Items.Clear();
 		}
 		
 		void ButtonShowRepresentationClick(object sender, EventArgs e){
@@ -448,13 +453,6 @@ namespace pSALG
 			}
 		}
 		
-		void ButtonExecuteDijkstraClick(object sender, EventArgs e){
-			int source;
-			source = Convert.ToInt32(textBoxSourceVertex.Text)-1;
-			dijkstra(source);
-			printAllShortestPaths(source);
-		}
-		
 		void printAllShortestPaths(int source){
 			int selected, len;
 			string representation;
@@ -475,6 +473,89 @@ namespace pSALG
 				len = representation.Length-2;
 				representation = representation.Remove(len,2);
 				listBoxShortestPaths.Items.Add(representation);
+			}
+		}
+		
+		void PictureBoxShowImageMouseClick(object sender, MouseEventArgs e){
+			double pbWidth = pictureBoxShowImage.Width;//original measurements in pictureBox
+			double pbHeight = pictureBoxShowImage.Height;//original measurements in pictureBox
+			double bmpWidth = bmp.Width;//original measurements in bmp
+			double bmpHeight = bmp.Height;//original measurements in bmp
+			double distanceWidth, distanceHeight;//distances in bmp
+			double scalingWidth, scalingHeight, scaling;//scaled
+			double radio;  //Circle
+			int pointX, pointY;//circle
+			double c, a ,b;	//to calculate Pythagoras
+			double bmpX, bmpY; //points at BitMap
+			
+			scalingWidth = pbWidth/bmpWidth;
+			scalingHeight = pbHeight/bmpHeight;
+			if(scalingWidth < scalingHeight){
+				scaling = scalingWidth;
+			}else{
+				scaling = scalingHeight;
+			}
+			distanceWidth = (pbWidth-bmpWidth*scaling)/2;
+			distanceHeight = (pbHeight-bmpHeight*scaling)/2;
+			bmpX = (e.X-distanceWidth)/scaling;
+			bmpY = (e.Y-distanceHeight)/scaling;
+			
+			for(int i = 0; i < circles.Count ;i++){
+				Circle circle = circles[i];
+				radio = circle.getRadio();
+				pointX = circle.getX();
+				pointY = circle.getY();
+				a = Math.Abs(pointX-bmpX);
+				b = Math.Abs(pointY-bmpY);
+				c = a*a + b*b - radio*radio;
+				if(c < 0){
+					if(clicks == 1){
+						//animaParricula();
+						clicks = 0;
+					}else{
+						bmp = new Bitmap(openFileDialogToSearchFile.FileName);
+						printGraphOnImage();
+						drawParticula(pointX,pointY);
+						sourceIndex = i;
+						dijkstra(sourceIndex);
+						printAllShortestPaths(sourceIndex);
+						makeOptionsComboBoxDestinations();
+						clicks++;
+					}
+					break;
+				}
+			}
+		}
+		
+		void drawParticula(int x, int y){
+			Brush brush = new SolidBrush(Color.LightGreen);
+			Graphics g = Graphics.FromImage(bmp);
+			g.FillEllipse(brush,x-10,y-10,20,20);
+			pictureBoxShowImage.Image = bmp;
+		}
+		
+		void makeOptionsComboBoxDestinations(){
+			comboBoxDestinations.Items.Clear();
+			for(int i = 0; i < graph.getVertexCount(); i++){
+				if(i != sourceIndex){
+					comboBoxDestinations.Items.Add(i+1);
+				}
+			}
+		}
+		
+		void ButtonShowPathClick(object sender, EventArgs e){
+			int destination;
+			Circle c1, c2;
+			bmp = new Bitmap(openFileDialogToSearchFile.FileName);
+			destination = Convert.ToInt32(comboBoxDestinations.Text)-1;
+			c1 = circles.Find(c=>c.getId() == sourceIndex+1);
+			printGraphOnImage();
+			drawParticula(c1.getX(),c1.getY());
+			while(destination != sourceIndex){
+				c1 = circles.Find(c=>c.getId() == destination+1);
+				c2 = circles.Find(c=>c.getId() == dijkstraElements[destination].getParent()+1);
+				printLine(1,c1.getX(),c1.getY(),c2.getX(),c2.getY());
+				destination = dijkstraElements[destination].getParent();
 			}
 		}
 	}
