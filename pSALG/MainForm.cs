@@ -11,8 +11,10 @@ namespace pSALG
 		Graph graph;
 		DijkstraElement[] dijkstraElements;
 		Bitmap bmp;
+		Bitmap bmpAnimations; 
 		int clicks;
 		int sourceIndex;
+		int destinationIndex;
 		
 		public MainForm(){
 			InitializeComponent();
@@ -33,7 +35,7 @@ namespace pSALG
 				graph = new Graph();
 				bmp = new Bitmap(openFileDialogToSearchFile.FileName);
 				pictureBoxShowImage.Image = bmp;
-				clicks = sourceIndex = 0;
+				clicks = sourceIndex = destinationIndex = 0;
 				clearAllListBox();
 				binarized();
 				searchCircles();
@@ -330,21 +332,28 @@ namespace pSALG
 				}
 				i++;
 			}
+			pictureBoxShowImage.BackgroundImage = bmp;
+			pictureBoxShowImage.BackgroundImageLayout = ImageLayout.Zoom;
 		}
 		
 		void printLine(int mst, int x1, int y1, int x2, int y2){
-			Graphics g = Graphics.FromImage(bmp); 
+			Graphics g;
 			Pen pen;
+			PointF p1 = new PointF(x1,y1);
+			PointF p2 = new PointF(x2,y2);
+			
 			if(mst == 1){
-				pen = new Pen(Color.Red,5);	
+				pen = new Pen(Color.Red,5);
+				g = Graphics.FromImage(bmpAnimations);
+				g.DrawLine(pen,p1,p2);
+				pictureBoxShowImage.Image = bmpAnimations;
 			}
 			else{
 				pen = new Pen(Color.Gray,2);
+				g = Graphics.FromImage(bmp);
+				g.DrawLine(pen,p1,p2);
+				pictureBoxShowImage.Image = bmp;
 			}
-			PointF p1 = new PointF(x1,y1);
-			PointF p2 = new PointF(x2,y2);
-			g.DrawLine(pen,p1,p2);
-			pictureBoxShowImage.Image = bmp;
 		}
 	
 		void clearAllListBox(){
@@ -376,6 +385,8 @@ namespace pSALG
 				markPoint(cir.getX(),cir.getY(),cir.getId(),printClosestPoints);
 			}
 			pictureBoxShowImage.Image = bmp;
+			pictureBoxShowImage.BackgroundImage = bmp;
+			pictureBoxShowImage.BackgroundImageLayout = ImageLayout.Zoom;
 		}
 		
 		void printGraphOnImage(){
@@ -386,6 +397,8 @@ namespace pSALG
 				}
 			}
 			pictureBoxShowImage.Image = bmp;
+			pictureBoxShowImage.BackgroundImage = bmp;
+			pictureBoxShowImage.BackgroundImageLayout = ImageLayout.Zoom;
 		}
 		
 		void makeSetDijkstraElements(int source){
@@ -456,19 +469,18 @@ namespace pSALG
 		void printAllShortestPaths(int source){
 			int selected, len;
 			string representation;
-			List<int> paths;
+			Stack<int> paths;
 			listBoxShortestPaths.Items.Clear();
 			for(int i = 0; i < graph.getVertexCount(); i++){
 				selected = i;
-				paths = new List<int>();
+				paths = new Stack<int>();
 				while(selected != source){
-					paths.Add(selected);
+					paths.Push(selected);
 					selected = dijkstraElements[selected].getParent();
 				}
-				paths.Reverse();
 				representation = source+1 + "->";
-				foreach(int vertex_id in paths){
-					representation += vertex_id+1 +"->";
+				while(paths.Count > 0){
+					representation += paths.Pop()+1 +"->";
 				}
 				len = representation.Length-2;
 				representation = representation.Remove(len,2);
@@ -510,12 +522,17 @@ namespace pSALG
 				c = a*a + b*b - radio*radio;
 				if(c < 0){
 					if(clicks == 1){
-						//animaParricula();
+						destinationIndex = i;
+						animaPath();
+						bmpAnimations = new Bitmap(bmp.Width,bmp.Height);
+						pictureBoxShowImage.Image = bmpAnimations;
+						listBoxShortestPaths.Items.Clear();
+						comboBoxDestinations.Items.Clear();
+						comboBoxDestinations.Text = "Select a vertex";
 						clicks = 0;
 					}else{
-						bmp = new Bitmap(openFileDialogToSearchFile.FileName);
-						printGraphOnImage();
-						drawParticula(pointX,pointY);
+						bmpAnimations = new Bitmap(bmp.Width,bmp.Height);
+						drawParticula(false,pointX,pointY);
 						sourceIndex = i;
 						dijkstra(sourceIndex);
 						printAllShortestPaths(sourceIndex);
@@ -527,11 +544,17 @@ namespace pSALG
 			}
 		}
 		
-		void drawParticula(int x, int y){
-			Brush brush = new SolidBrush(Color.LightGreen);
-			Graphics g = Graphics.FromImage(bmp);
+		void drawParticula(bool isAntecesor,int x, int y){
+			Brush brush;
+			if(isAntecesor){
+				brush = new SolidBrush(Color.White);
+			}
+			else{
+				brush = new SolidBrush(Color.Red);	
+			}
+			Graphics g = Graphics.FromImage(bmpAnimations);
 			g.FillEllipse(brush,x-10,y-10,20,20);
-			pictureBoxShowImage.Image = bmp;
+			pictureBoxShowImage.Image = bmpAnimations;
 		}
 		
 		void makeOptionsComboBoxDestinations(){
@@ -546,16 +569,77 @@ namespace pSALG
 		void ButtonShowPathClick(object sender, EventArgs e){
 			int destination;
 			Circle c1, c2;
-			bmp = new Bitmap(openFileDialogToSearchFile.FileName);
+			bmpAnimations = new Bitmap(bmp.Width,bmp.Height);
 			destination = Convert.ToInt32(comboBoxDestinations.Text)-1;
 			c1 = circles.Find(c=>c.getId() == sourceIndex+1);
-			printGraphOnImage();
-			drawParticula(c1.getX(),c1.getY());
+			drawParticula(false,c1.getX(),c1.getY());
 			while(destination != sourceIndex){
 				c1 = circles.Find(c=>c.getId() == destination+1);
 				c2 = circles.Find(c=>c.getId() == dijkstraElements[destination].getParent()+1);
 				printLine(1,c1.getX(),c1.getY(),c2.getX(),c2.getY());
 				destination = dijkstraElements[destination].getParent();
+			}
+			pictureBoxShowImage.Image = bmpAnimations;
+		}
+		
+		void animaPath(){
+			int destination, source;
+			Stack<int> points = new Stack<int>();
+			destination = destinationIndex;
+			source = sourceIndex;
+			
+			while(destination != source){
+				points.Push(destination);
+				destination = dijkstraElements[destination].getParent();
+			}
+			while(points.Count>0){
+				animaParticula(source,points.Peek());
+				source = points.Pop();
+			}
+		}
+		
+		void animaParticula(int source, int destination){
+ 			double m, b, iteratorX = 0, iteratorY = 0;
+ 			double antecesorX, antecesorY;
+			double sourceX,sourceY;
+			double destinationX,destinationY;
+			int increment;
+			Graphics g = Graphics.FromImage(bmpAnimations);
+			sourceX = circles[source].getX();
+			sourceY = circles[source].getY();
+			destinationX = circles[destination].getX();
+			destinationY = circles[destination].getY();
+			m = (destinationY- sourceY) / (destinationX - sourceX);
+			b = destinationY - destinationX * m;
+			increment = 1;
+			
+			antecesorY = sourceY;
+			antecesorX = sourceX;
+			if(m > -1 && m < 1){
+				if(destinationX < sourceX){
+					increment = -1;
+				}
+				for(iteratorX = sourceX+1; iteratorX != destinationX; iteratorX += increment){
+					iteratorY = m*iteratorX +  b;
+					drawParticula(true,(int)(Math.Round(iteratorX-increment)),(int)(Math.Round(antecesorY)));
+					drawParticula(false,(int)(Math.Round(iteratorX)),(int)(Math.Round(iteratorY)));
+					pictureBoxShowImage.Refresh();
+					g.Clear(Color.Transparent);
+					antecesorY = iteratorY;
+				}
+			}
+			else{
+				if(destinationY < sourceY){
+					increment = -1;
+				}
+				for(iteratorY = sourceY+1; iteratorY != destinationY; iteratorY += increment){
+					iteratorX = (iteratorY - b)/ m;
+					drawParticula(true,(int)(Math.Round(antecesorX)),(int)(Math.Round(iteratorY-increment)));
+					drawParticula(false,(int)(Math.Round(iteratorX)),(int)(Math.Round(iteratorY)));
+					pictureBoxShowImage.Refresh();
+					g.Clear(Color.Transparent);
+					antecesorX = iteratorX;
+				}
 			}
 		}
 	}
