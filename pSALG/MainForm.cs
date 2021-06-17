@@ -120,7 +120,7 @@ namespace pSALG
 			a = Math.Pow(x2 - x, 2);
 			b = Math.Pow(y2 - y, 2);
 			d = Math.Sqrt(a + b);
-			if(c < sRadio+6 || d < dRadio+6){
+			if(c < sRadio+5 || d < dRadio+5){
 				return false;
 			}
 			return true;
@@ -139,7 +139,7 @@ namespace pSALG
 			difY = Math.Abs(y1-y2);
 			difX = Math.Abs(x1-x2);
 			if(x1 == x2){
-				limit =	limit = Math.Max(y1,y2);
+				limit = Math.Max(y1,y2);
 				x = Math.Min(x1,x2);
 				for(y = Math.Min(y1,y2); y < limit; y++){
 					color = bmp.GetPixel((int)x,(int)y);
@@ -158,6 +158,16 @@ namespace pSALG
 					}
 				}
 			}
+			/*else if(y1 == y2){
+				limit = Math.Max(x1,x2);
+				y = Math.Min(y1,y2);
+				for(x = Math.Min(x1,x2); x < limit; x++){
+					color = bmp.GetPixel((int)x,(int)y);
+					if(!isGray(color) && !isWhite(color) && isOutOfCircles((int)x,(int)y,x1,y1,sRadio,x2,y2,dRadio)){
+						return true;
+					}
+				}
+			}*/
 			else{
 				limit = Math.Max(x1,x2);
 				for(x = Math.Min(x1,x2); x < limit; x++){
@@ -288,7 +298,7 @@ namespace pSALG
         	             bmp.SetPixel(j, i, Color.Black);
 		}
 		
-		void markPoint(int x, int y, int id, Boolean isForClosest){
+		/*void markPoint(int x, int y, int id, Boolean isForClosest){
 			Graphics g =  Graphics.FromImage(bmp);
 			Font = new Font("Microsoft Sans Serif", 17, FontStyle.Regular, GraphicsUnit.Pixel);
 			
@@ -305,7 +315,7 @@ namespace pSALG
 			}
 			g.Flush();
 			pictureBoxShowImage.Image= bmp;
-		}
+		}*/
 		
 		void colorCenter(int x, int y){
 			bmp.SetPixel(x,y,Color.Yellow);
@@ -381,9 +391,7 @@ namespace pSALG
 		}
 		
 		void printCirclesOnImage(Boolean printClosestPoints){
-			foreach(Circle cir in circles){
-				markPoint(cir.getX(),cir.getY(),cir.getId(),printClosestPoints);
-			}
+			
 			pictureBoxShowImage.Image = bmp;
 			pictureBoxShowImage.BackgroundImage = bmp;
 			pictureBoxShowImage.BackgroundImageLayout = ImageLayout.Zoom;
@@ -599,11 +607,12 @@ namespace pSALG
 		}
 		
 		void animaParticula(int source, int destination){
- 			double m, b, iteratorX = 0, iteratorY = 0;
- 			double antecesorX, antecesorY;
-			double sourceX,sourceY;
-			double destinationX,destinationY;
-			int increment;
+ 			float m, b, iteratorX = 0, iteratorY = 0;
+ 			float antecesorX, antecesorY;
+			float sourceX,sourceY;
+			float destinationX,destinationY;
+			double x,y;
+			int increment, limit;
 			Graphics g = Graphics.FromImage(bmpAnimations);
 			sourceX = circles[source].getX();
 			sourceY = circles[source].getY();
@@ -615,7 +624,20 @@ namespace pSALG
 			
 			antecesorY = sourceY;
 			antecesorX = sourceX;
-			if(m > -1 && m < 1){
+			if(sourceX == destinationX){
+				if(destinationY < sourceY){
+					increment = -1;
+				}
+				x = Math.Min(sourceX,destinationX);
+				for(y = sourceY+1; y != destinationY; y+=increment){
+					drawParticula(true,(int)x,(int)antecesorY);
+					drawParticula(false,(int)x,(int)y);
+					pictureBoxShowImage.Refresh();
+					g.Clear(Color.Transparent);
+					antecesorY = (float)y;
+				}
+			}
+			else if(m > -1 && m < 1){
 				if(destinationX < sourceX){
 					increment = -1;
 				}
@@ -642,5 +664,67 @@ namespace pSALG
 				}
 			}
 		}
+		
+		/*void animaParticula(int source, int destination){
+			int x1,x2,y1,y2, increment;
+			double antecesorY,antecesorX;
+			Graphics g = Graphics.FromImage(bmpAnimations);
+			x1 = circles[source].getX();
+			y1 = circles[source].getY();
+			x2 = circles[destination].getX();
+			y2 = circles[destination].getY();
+			double m, c, y, x;
+			int limit, difX,difY;
+			//define equation menbers
+			antecesorY = y1;
+   			antecesorX = x1;
+   			increment = 1;
+			m = c = 0;
+			if((x2-x1) != 0){
+				m = ((double)y2-(double)y1)/((double)x2-(double)x1);
+				c = (-1 * (double)x1 * (double)m) + (double)y1;					
+			}
+			difY = Math.Abs(y1-y2);
+			difX = Math.Abs(x1-x2);
+			if(x1 == x2){
+				limit = Math.Max(y1,y2);
+				x = Math.Min(x1,x2);
+				for(y = Math.Min(y1,y2); y < limit; y++){
+					drawParticula(true,(int)x,(int)antecesorY);
+					drawParticula(false,(int)x,(int)y);
+					pictureBoxShowImage.Refresh();
+					g.Clear(Color.Transparent);
+					antecesorY = y;
+				}
+			}
+			else if(difX <= difY && (int)m != 0){
+				if(y2 < y1){
+		           increment = -1;
+		       	}
+				limit = Math.Max(y1,y2);
+				for(y = Math.Min(y1,y2); y < limit; y++){
+					x = ((double)y/(double)m)-((double)y1/(double)m)+(double)x1;
+					drawParticula(true,(int)antecesorX,(int)(y-increment));
+					drawParticula(false,(int)x,(int)y);
+					pictureBoxShowImage.Refresh();
+					g.Clear(Color.Transparent);
+					antecesorX = x;
+				}
+			}
+			else{
+				if(x2 < x1){
+		        	increment = -1;
+		       	}
+				limit = Math.Max(x1,x2);
+				for(x = Math.Min(x1,x2); x < limit; x++){
+					y = ((double)m * (double)x) + (double)c;
+					drawParticula(true,(int)x-increment,(int)antecesorY);
+					drawParticula(false,(int)x,(int)y);
+					pictureBoxShowImage.Refresh();
+					g.Clear(Color.Transparent);
+					antecesorY = y;
+				}
+			}
+		}*/
 	}
 }
