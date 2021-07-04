@@ -34,4 +34,7 @@ The software was developed in C# using the SharpDevelop IDE, you can use any oth
 
 In the pSALG / bin folder you can find the used test images, avoid the images named as "prueba#.png".
 
-The current code in the repository corresponds to that of label 4 "Dijkstra", if you want to obtain any code from a stage other than four, download the corresponding tag
+The current code in the repository corresponds to that of label 4 "Dijkstra", if you want to obtain any code from a stage other than four, download the corresponding tag.
+
+I continued making commits in Spanish, because I made the first one in this language, and I decided to continue like this to give it a little homogeneity =).
+
